@@ -12,13 +12,13 @@
 @implementation NSNumber (SQLPackRat)
 
 
-+ (instancetype)numberWithSqliteInt64: (sqlite3_int64)value {
-    return [self numberWithLongLong: value];
++ (instancetype)numberWithSqliteInt64:(sqlite3_int64)value {
+    return [self numberWithLongLong:value];
 }
 
 
-- (instancetype)initWithSqliteInt64: (sqlite3_int64)value {
-    self = [self initWithLongLong: value];
+- (instancetype)initWithSqliteInt64:(sqlite3_int64)value {
+    self = [self initWithLongLong:value];
     if (self) {
         
     }

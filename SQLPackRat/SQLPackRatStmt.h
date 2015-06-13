@@ -11,44 +11,38 @@
 
 @class SQLPackRatDatabase;
 
-@interface SQLPackRatStmt : NSObject<NSFastEnumeration>
+@interface SQLPackRatStmt :NSObject<NSFastEnumeration>
 
-+ (instancetype)stmtWithDatabase: (SQLPackRatDatabase *)database;
-- (instancetype)initWithDatabase: (SQLPackRatDatabase *)database;
++ (instancetype)stmtWithDatabase:(SQLPackRatDatabase *)database;
+- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database;
 
-- (BOOL)prepare: (NSString *)SQL
-      remaining: (NSString **)outRemaining
-      withError: (NSError **)outError;
+- (BOOL)prepare:(NSString *)SQL remaining:(NSString **)outRemaining withError:(NSError **)outError;
 
-- (BOOL)closeWithError: (NSError **)outError;
+- (BOOL)closeWithError:(NSError **)outError;
 
-- (BOOL)resetWithError: (NSError **)outError;
+- (BOOL)resetWithError:(NSError **)outError;
 
 - (BOOL)clearBindingsWithError:(NSError **)outError;
 
-- (BOOL)bind: (NSObject *)value
-     toIndex: (NSInteger)binding
-   withError: (NSError **)outError;
+- (BOOL)bind:(NSObject *)value toIndex:(NSInteger)binding withError:(NSError **)outError;
 
-- (BOOL)bindKeyValues: (NSDictionary *)keyValues
-            withError: (NSError **)outError;
+- (BOOL)bindKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (BOOL)bindArray: (NSArray *)values
-        withError: (NSError **)outError;
+- (BOOL)bindArray:(NSArray *)values withError:(NSError **)outError;
 
-- (BOOL)stepWithError: (NSError **)outError;
+- (BOOL)stepWithError:(NSError **)outError;
 
-- (BOOL)skipWithError: (NSError **)outError;
+- (BOOL)skipWithError:(NSError **)outError;
 
 - (NSInteger)numberOfColumns;
 
-- (NSString *)columnNameByIndex: (NSInteger)column;
+- (NSString *)columnNameByIndex:(NSInteger)column;
 
-- (NSString *)columnStringByIndex: (NSInteger)column;
+- (NSString *)columnStringByIndex:(NSInteger)column;
 
-- (NSInteger)columnIntegerByIndex: (NSInteger)column;
+- (NSInteger)columnIntegerByIndex:(NSInteger)column;
 
-- (NSUInteger)columnUIntegerByIndex: (NSInteger)column;
+- (NSUInteger)columnUIntegerByIndex:(NSInteger)column;
 
 - (BOOL)haveStmt;
 
@@ -59,8 +53,8 @@
 - (NSArray *)columns;
 - (NSArray *)row;
 
-- (NSArray *)contentsWithError: (NSError **)outError;
+- (NSArray *)contentsWithError:(NSError **)outError;
 
-- (NSDictionary *)nextRecord: (NSError **)outError;
+- (NSDictionary *)nextRecord:(NSError **)outError;
 
 @end

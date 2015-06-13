@@ -16,7 +16,7 @@
 #endif
 
 
-@interface SQLPackRatTransaction()
+@interface SQLPackRatTransaction ()
 @property (nonatomic, readwrite, strong) NSString *label;
 @property (nonatomic, readwrite, strong) NSError *lastError;
 @property (nonatomic, readwrite, strong) SQLPackRatDatabase *database;
@@ -24,89 +24,84 @@
 @end
 
 
+static inline void SetError(NSError **error, NSError *e) {
+    if (error) *error = e;
+}
+
+
 @implementation SQLPackRatTransaction
 
 
-+ (instancetype)transactionWithDatabase: (SQLPackRatDatabase *)database
-                                  label: (NSString *)label {
-    return [[self alloc] initWithDatabase: database
-                                    label: label];
++ (instancetype)transactionWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label {
+    return [[self alloc] initWithDatabase:database label:label];
 }
 
 
-+ (instancetype)transactionWithDatabase: (SQLPackRatDatabase *)database
-                                  label: (NSString *)label
-                              startMode: (SQLPackRatTransactionStartMode)startMode
-                              withError: (NSError **)error {
-    return [[self alloc] initWithDatabase: database
-                                    label: label
-                                startMode: startMode
-                                withError: error];
++ (instancetype)transactionWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError **)error {
+    return [[self alloc] initWithDatabase:database label:label startMode:startMode withError:error];
 }
 
 
-- (instancetype)initWithDatabase: (SQLPackRatDatabase *)database
-                           label: (NSString *)label {
-    if (( self = [super init] )) {
-        _database = database;
-        _label = label;
+- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label {
+    self = [super init];
+    if (!self) {
+        return nil;
     }
+    _database = database;
+    _label = label;
     return self;
 }
 
 
-- (instancetype)initWithDatabase: (SQLPackRatDatabase *)database
-                           label: (NSString *)label
-                       startMode: (SQLPackRatTransactionStartMode)startMode
-                       withError: (NSError *__autoreleasing *)error {
-    if (( self = [super init] )) {
-        NSError *e;
-        _database = database;
-        _label = label;
-        switch (startMode) {
-            case SQLPackRatTransactionStartModeAutomaticallyLater:
-                if (![self beginWithError:&e]) {
-                    if (error) *error = e;
-                    return nil;
-                }
-                break;
-            case SQLPackRatTransactionStartModeAutomaticallyNow:
-                if (![self beginImmediateWithError:&e]) {
-                    if (error) *error = e;
-                    return nil;
-                }
-                break;
-            default:
-                break;
-        }
+- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError *__autoreleasing *)error {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    NSError *e;
+    _database = database;
+    _label = label;
+    switch (startMode) {
+        case SQLPackRatTransactionStartModeAutomaticallyLater:
+            if (![self beginWithError:&e]) {
+                if (error) *error = e;
+                return nil;
+            }
+            break;
+        case SQLPackRatTransactionStartModeAutomaticallyNow:
+            if (![self beginImmediateWithError:&e]) {
+                if (error) *error = e;
+                return nil;
+            }
+            break;
+        default:
+            break;
     }
     return self;
 }
 
 
 - (void)dealloc {
-    if ( _transaction ) {
+    if (_transaction) {
 #if DEBUG_TRANSACTIONS
-        NSLog( @"Transaction not closed: %@", _label );
+        NSLog(@"Transaction not closed:%@", _label);
 #endif
         NSError *error;
-        [self rollbackWithError: &error];
+        [self rollbackWithError:&error];
         _transaction = NO;
     }
     
 }
 
 
-- (BOOL)beginImmediateWithError: (NSError **)outError {
+- (BOOL)beginImmediateWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog( @"beginImmediate: %@", _label );
+    NSLog(@"beginImmediate:%@", _label);
 #endif
-    if ( ![_database executeSQL: @"BEGIN IMMEDIATE;"
-               bindingKeyValues: nil
-                      withError: &error] ) {
+    if (![_database executeSQL:@"BEGIN IMMEDIATE;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
-        if ( outError ) { *outError = error; }
+        SetError(outError, error);
         return NO;
     }
     _transaction = YES;
@@ -115,16 +110,14 @@
 }
 
 
-- (BOOL)beginWithError: (NSError **)outError {
+- (BOOL)beginWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog( @"begin: %@", _label );
+    NSLog(@"begin:%@", _label);
 #endif
-    if ( ![_database executeSQL: @"BEGIN;"
-               bindingKeyValues: nil
-                      withError: &error] ) {
+    if (![_database executeSQL:@"BEGIN;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
-        if ( outError ) { *outError = error; }
+        SetError(outError, error);
         return NO;
     }
     _transaction = YES;
@@ -133,16 +126,14 @@
 }
 
 
-- (BOOL)commitWithError: (NSError **)outError {
+- (BOOL)commitWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog( @"end: %@", _label );
+    NSLog(@"end:%@", _label);
 #endif
-    if ( ![_database executeSQL: @"END;"
-               bindingKeyValues: nil
-                      withError: &error] ) {
+    if (![_database executeSQL:@"END;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
-        if ( outError ) { *outError = error; }
+        SetError(outError, error);
         return NO;
     }
     _transaction = NO;
@@ -151,16 +142,14 @@
 }
 
 
-- (BOOL)rollbackWithError: (NSError **)outError {
+- (BOOL)rollbackWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog( @"rollback: %@", _label );
+    NSLog(@"rollback:%@", _label);
 #endif
-    if ( ![_database executeSQL: @"ROLLBACK;"
-               bindingKeyValues: nil
-                      withError: &error] ) {
+    if (![_database executeSQL:@"ROLLBACK;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
-        if ( outError ) { *outError = error; }
+        SetError(outError, error);
         return NO;
     }
     _transaction = NO;
@@ -175,7 +164,7 @@
 
 
 - (NSString *)description {
-    return [NSString stringWithFormat: @"<SQLPackRatTransaction: %@>{open = %@}", _label, _transaction ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"<SQLPackRatTransaction:%@>{open = %@}", _label, _transaction ? @"YES" :@"NO"];
 }
 
 

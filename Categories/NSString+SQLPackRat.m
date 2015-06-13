@@ -16,9 +16,9 @@
 - (instancetype)initWithSQLFormat:(char *)format, ... {
     va_list ap;
     va_start(ap, format);
-    char *m = sqlite3_vmprintf( format, ap );
-    self = [self initWithCString: m encoding: NSUTF8StringEncoding];
-    sqlite3_free( m );
+    char *m = sqlite3_vmprintf(format, ap);
+    self = [self initWithCString:m encoding:NSUTF8StringEncoding];
+    sqlite3_free(m);
     va_end(ap);
     return self;
 }
@@ -26,15 +26,15 @@
 + (instancetype)stringWithSQLFormat:(char *)format, ... {
     va_list ap;
     va_start(ap, format);
-    char *m = sqlite3_vmprintf( format, ap );
+    char *m = sqlite3_vmprintf(format, ap);
     NSString *str = @(m);
-    sqlite3_free( m );
+    sqlite3_free(m);
     va_end(ap);
     return str;
 }
 
-+ (instancetype)stringWithSqliteInt64: (sqlite3_int64)value {
-    return [NSString stringWithFormat: @"%lld", value];
++ (instancetype)stringWithSqliteInt64:(sqlite3_int64)value {
+    return [NSString stringWithFormat:@"%lld", value];
 }
 
 @end

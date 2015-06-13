@@ -14,7 +14,8 @@ extern NSString *SQLPackRatWrapperErrorDomain;
 
 typedef NS_ENUM(NSInteger, SQLPackRatWrapperError) {
     SQLPackRatWrapperErrorSwuccess = 0,
-    SQLPackRatWrapperErrorNoRecords
+    SQLPackRatWrapperErrorNoRecords,
+    SQLPackRatWrapperErrorUnsupportedType
 };
 
 typedef NS_ENUM(NSInteger, SQLPackRatSQL3Error) {

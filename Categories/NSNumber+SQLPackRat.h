@@ -11,8 +11,8 @@
 
 @interface NSNumber (SQLPackRat)
 
-+ (instancetype)numberWithSqliteInt64: (sqlite3_int64)value;
-- (instancetype)initWithSqliteInt64: (sqlite3_int64)value;
++ (instancetype)numberWithSqliteInt64:(sqlite3_int64)value;
+- (instancetype)initWithSqliteInt64:(sqlite3_int64)value;
 - (sqlite3_int64)sqliteInt64Value;
 
 @end
