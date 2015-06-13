@@ -18,14 +18,17 @@ typedef void(^SQLPackRatCompletion)(NSError *error);
 typedef void(^SQLPackRatInsertCompletion)(NSError *error, NSNumber *record);
 typedef void(^SQLPackRatRecordCompletion)(NSError *error, NSDictionary *record);
 typedef void(^SQLPackRatRecordsCompletion)(NSError *error, NSArray *records);
+typedef void(^SQLPackRatFunc)(sqlite3_context *context, int argC, sqlite3_value **argsV);
+typedef void(^SQLPackRatStep)(sqlite3_context *context, int argC, sqlite3_value **argsV);
+typedef void(^SQLPackRatFinal)(sqlite3_context *context);
 
-@interface SQLPackRatDatabase :NSObject
+@interface SQLPackRatDatabase : NSObject
 
 @property (nonatomic, readonly, assign) sqlite3 *sqlite3;
 @property (nonatomic, readwrite, assign) BOOL refuseMainThread;
 @property (nonatomic, readwrite, assign) BOOL transactionsEnabled;
 
-+ (instancetype)database;
+- (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError NS_DESIGNATED_INITIALIZER;
 
 - (NSInteger)schemaVersion;
 
@@ -37,13 +40,15 @@ typedef void(^SQLPackRatRecordsCompletion)(NSError *error, NSArray *records);
 
 - (void)close;
 
-- (SQLPackRatStmt *)stmt;
+#if COMPATIBILITY_MODE
+- (SQLPackRatStmt *)newStmt;
+#endif
 
-- (SQLPackRatStmt *)stmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
+- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (SQLPackRatStmt *)stmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
+- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 
-- (SQLPackRatTransaction *)transactionWithLabel:(NSString *)label;
+- (SQLPackRatTransaction *)newTransactionWithLabel:(NSString *)label;
 
 - (BOOL)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings withError:(NSError **)outError;
 
@@ -61,9 +66,11 @@ typedef void(^SQLPackRatRecordsCompletion)(NSError *error, NSArray *records);
 
 - (BOOL)executeSQLNamed:(NSString *)name fromBundle:(NSBundle *)bundle bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError;
-
 - (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError;
+
+- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPackRatFunc)function step:(SQLPackRatStep)step final:(SQLPackRatFinal)final withError:(NSError **)outError;
+
+- (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError;
 
 - (NSArray *)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 

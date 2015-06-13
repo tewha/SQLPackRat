@@ -37,6 +37,8 @@
 		A7ECE61D1B2BAB4100254107 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE61C1B2BAB4100254107 /* main.swift */; };
 		A7ECE6221B2BAD0E00254107 /* libSQLPackRat-OSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE5CD1B2BA7CF00254107 /* libSQLPackRat-OSX.a */; };
 		A7ECE6241B2BAD1D00254107 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE6231B2BAD1D00254107 /* libsqlite3.dylib */; };
+		A7ECE6271B2BBDD600254107 /* CustomFunctionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE6261B2BBDD600254107 /* CustomFunctionTests.m */; };
+		A7ECE62E1B2BC1C200254107 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE6231B2BAD1D00254107 /* libsqlite3.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +85,7 @@
 		A7ECE61C1B2BAB4100254107 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A7ECE6211B2BAB8C00254107 /* SQLPackRatJSON-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SQLPackRatJSON-Bridging-Header.h"; sourceTree = "<group>"; };
 		A7ECE6231B2BAD1D00254107 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		A7ECE6261B2BBDD600254107 /* CustomFunctionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomFunctionTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7ECE62E1B2BC1C200254107 /* libsqlite3.dylib in Frameworks */,
 				A7ECE5D91B2BA7CF00254107 /* libSQLPackRat-OSX.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -163,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				A7ECE5DD1B2BA7CF00254107 /* Supporting Files */,
+				A7ECE6261B2BBDD600254107 /* CustomFunctionTests.m */,
 			);
 			path = SQLPackRatTests;
 			sourceTree = "<group>";
@@ -366,6 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7ECE6271B2BBDD600254107 /* CustomFunctionTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

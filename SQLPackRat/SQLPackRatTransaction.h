@@ -16,11 +16,7 @@ typedef NS_ENUM(NSInteger, SQLPackRatTransactionStartMode) {
     SQLPackRatTransactionStartModeAutomaticallyNow
 };
 
-@interface SQLPackRatTransaction :NSObject
-
-+ (instancetype)transactionWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label;
-
-+ (instancetype)transactionWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError **)error;
+@interface SQLPackRatTransaction : NSObject
 
 - (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label;
 

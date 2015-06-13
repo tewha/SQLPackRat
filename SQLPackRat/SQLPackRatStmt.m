@@ -50,11 +50,6 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-+ (instancetype)stmtWithDatabase:(SQLPackRatDatabase *)database {
-    return [[self alloc] initWithDatabase:database];
-}
-
-
 - (instancetype)initWithDatabase:(SQLPackRatDatabase *)database {
     self = [super init];
     if (!self) {
@@ -77,7 +72,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 - (NSError *)errorWithSQLPackRatErrorCode:(NSInteger)errorCode {
     const char *errMsg = sqlite3_errmsg([_database sqlite3]);
-    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@(errMsg), @"CurrentSQL":_current ? :@""};
+    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@(errMsg), @"CurrentSQL":_current ?: @""};
     NSError *error = [NSError errorWithDomain:SQLPackRatSQL3ErrorDomain code:errorCode userInfo:userInfo];
     return error;
 }
@@ -99,8 +94,8 @@ static inline void SetError(NSError **error, NSError *e) {
     const char *tail = NULL;
     NSUInteger length = [sqlData length];
     int err = sqlite3_prepare_v2(sqlite3, head, (int)length, &_stmt, &tail);
-    NSUInteger consumed = tail ? ((intptr_t)tail - (intptr_t)head) :0;
-    self.current = consumed > 0 ?[[NSString alloc] initWithBytes :head length:consumed encoding:NSUTF8StringEncoding] :nil;
+    NSUInteger consumed = tail ? ((intptr_t)tail - (intptr_t)head) : 0;
+    self.current = consumed > 0 ? [[NSString alloc] initWithBytes:head length:consumed encoding:NSUTF8StringEncoding] : nil;
     if (err != SQLITE_OK) {
         error = [self errorWithSQLPackRatErrorCode:err];
         [self logError:error];
@@ -310,7 +305,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 - (NSString *)columnNameByIndex:(NSInteger)column {
     const char *text = (const char *)sqlite3_column_name(_stmt, (int)column);
-    NSString *str = text ? @(text) :nil;
+    NSString *str = text ? @(text) : nil;
     return str;
 }
 
@@ -353,7 +348,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 - (NSString *)columnStringByIndex:(NSInteger)column {
     const char *text = (const char *)sqlite3_column_text(_stmt, (int)column);
-    NSString *str = text ? @(text) :nil;
+    NSString *str = text ? @(text) : nil;
     return str;
 }
 
@@ -438,7 +433,7 @@ static inline void SetError(NSError **error, NSError *e) {
     while ([self haveRow]) {
         NSMutableDictionary *row = [[NSMutableDictionary alloc] init];
         for (NSInteger column = 0; column < count; ++column) {
-            NSString *name = [self columnNameByIndex:column] ? :@"";
+            NSString *name = [self columnNameByIndex:column] ? : @"";
             id value = [self columnValueByIndex:column];
             if (!value || value == [NSNull null]) continue;
             row[name] = value;

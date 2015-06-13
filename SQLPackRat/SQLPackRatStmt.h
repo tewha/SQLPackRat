@@ -11,9 +11,8 @@
 
 @class SQLPackRatDatabase;
 
-@interface SQLPackRatStmt :NSObject<NSFastEnumeration>
+@interface SQLPackRatStmt : NSObject<NSFastEnumeration>
 
-+ (instancetype)stmtWithDatabase:(SQLPackRatDatabase *)database;
 - (instancetype)initWithDatabase:(SQLPackRatDatabase *)database;
 
 - (BOOL)prepare:(NSString *)SQL remaining:(NSString **)outRemaining withError:(NSError **)outError;

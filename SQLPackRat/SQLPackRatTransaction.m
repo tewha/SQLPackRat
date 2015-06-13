@@ -32,16 +32,6 @@ static inline void SetError(NSError **error, NSError *e) {
 @implementation SQLPackRatTransaction
 
 
-+ (instancetype)transactionWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label {
-    return [[self alloc] initWithDatabase:database label:label];
-}
-
-
-+ (instancetype)transactionWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError **)error {
-    return [[self alloc] initWithDatabase:database label:label startMode:startMode withError:error];
-}
-
-
 - (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label {
     self = [super init];
     if (!self) {
@@ -164,7 +154,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<SQLPackRatTransaction:%@>{open = %@}", _label, _transaction ? @"YES" :@"NO"];
+    return [NSString stringWithFormat:@"<SQLPackRatTransaction:%@>{open = %@}", _label, _transaction ? @"YES" : @"NO"];
 }
 
 

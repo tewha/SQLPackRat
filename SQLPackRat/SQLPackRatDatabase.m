@@ -28,6 +28,14 @@
 #endif
 #endif
 
+static NSString *TargetKey = @"Target";
+static NSString *FuncSelectorKey = @"FuncSelector";
+static NSString *StepSelectorKey = @"StepSelector";
+static NSString *FinalSelectorKey = @"FinalSelector";
+static NSString *FuncBlockKey = @"FuncBlock";
+static NSString *StepBlockKey = @"StepBlock";
+static NSString *FinalBlockKey = @"FinalBlock";
+
 @interface SQLPackRatDatabase ()
 @property (nonatomic, readwrite, strong) NSString *path;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *functions;
@@ -60,6 +68,7 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
+#if COMPATIBILITY_MODE
 - (instancetype)init {
     self = [super init];
     if (!self) {
@@ -71,11 +80,27 @@ static inline long fromNSInteger(NSInteger i) {
     _transactionsEnabled = !SQLPACKRAT_DISABLE_TRANSACTIONS;
     return self;
 }
+#endif
 
 
 
-+ (instancetype)database {
-    return [[self alloc] init];
+- (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    
+    _functions = [NSMutableDictionary dictionary];
+    _attaches = [NSMutableDictionary dictionary];
+    _logErrors = SQLPACKRAT_LOG_ERRORS;
+    _transactionsEnabled = !SQLPACKRAT_DISABLE_TRANSACTIONS;
+    
+    NSError *e;
+    if (![self openPath:path flags:flags vfs:VFS error:&e]) {
+        return nil;
+    }
+    
+    return self;
 }
 
 
@@ -165,13 +190,13 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (SQLPackRatStmt *)stmt {
-    return [SQLPackRatStmt stmtWithDatabase:self];
+- (SQLPackRatStmt *)newStmt {
+    return [[SQLPackRatStmt alloc] initWithDatabase:self];
 }
 
 
-- (SQLPackRatStmt *)stmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
-    SQLPackRatStmt *stmt = [self stmt];
+- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
+    SQLPackRatStmt *stmt = [[SQLPackRatStmt alloc] initWithDatabase:self];
     NSError *error;
     if (![stmt prepare:SQL remaining:nil withError:&error]) {
         [self logError:error];
@@ -187,8 +212,8 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (SQLPackRatStmt *)stmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
-    SQLPackRatStmt *stmt = [self stmt];
+- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
+    SQLPackRatStmt *stmt = [[SQLPackRatStmt alloc] initWithDatabase:self];
     NSError *error;
     if (![stmt prepare:SQL remaining:nil withError:&error]) {
         [self logError:error];
@@ -204,8 +229,8 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (SQLPackRatTransaction *)transactionWithLabel:(NSString *)label {
-    return [SQLPackRatTransaction transactionWithDatabase:self label:label];
+- (SQLPackRatTransaction *)newTransactionWithLabel:(NSString *)label {
+    return [[SQLPackRatTransaction alloc] initWithDatabase:self label:label];
 }
 
 
@@ -214,13 +239,13 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (BOOL)executeSQL:(NSString *)SQL bindBlock:(SQLPackRatBindBlock)bindBlock withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *st = [self stmt];
+    SQLPackRatStmt *st = [self newStmt];
     NSString *current = SQL;
     for (;;) {
         NSString *rest;
         if (![st prepare:current
-                remaining:&rest
-                withError:&error]) {
+               remaining:&rest
+               withError:&error]) {
             [self logError:error];
             SetError(outError, error);
             return NO;
@@ -256,14 +281,14 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (NSNumber *)changesFromSQL:(NSString *)SQL bindBlock:(SQLPackRatBindBlock)bindBlock withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *st = [self stmt];
+    SQLPackRatStmt *st = [self newStmt];
     NSString *current = SQL;
     NSInteger changes = 0;
     for (;;) {
         NSString *rest;
         if (![st prepare:current
-                remaining:&rest
-                withError:&error]) {
+               remaining:&rest
+               withError:&error]) {
             [self logError:error];
             SetError(outError, error);
             return nil;
@@ -459,10 +484,10 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 }
 
 
-static void xFuncGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
-    id fn = (__bridge id)sqlite3_user_data(context);
-    NSValue *funcValue = [fn objectForKey:@"Func"];
-    NSObject *target = [fn objectForKey:@"Target"];
+static void SelectorFuncGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
+    NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
+    NSValue *funcValue = [userData objectForKey:FuncSelectorKey];
+    NSObject *target = [userData objectForKey:TargetKey];
     SEL func;
     [funcValue getValue:&func];
     NSUInteger argCount = argC;
@@ -478,10 +503,10 @@ static void xFuncGlue(sqlite3_context *context, int argC, sqlite3_value **argsV)
 }
 
 
-static void xStepGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
-    id fn = (__bridge id)sqlite3_user_data(context);
-    NSValue *funcValue = [fn objectForKey:@"Step"];
-    NSObject *target = [fn objectForKey:@"Target"];
+static void SelectorStepGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
+    NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
+    NSValue *funcValue = [userData objectForKey:StepSelectorKey];
+    NSObject *target = [userData objectForKey:TargetKey];
     SEL func;
     [funcValue getValue:&func];
     
@@ -496,10 +521,10 @@ static void xStepGlue(sqlite3_context *context, int argC, sqlite3_value **argsV)
 }
 
 
-static void xFinalGlue(sqlite3_context *context) {
-    id fn = (__bridge id)sqlite3_user_data(context);
-    NSValue *funcValue = [fn objectForKey:@"Final"];
-    NSObject *target = [fn objectForKey:@"Target"];
+static void SelectorFinalGlue(sqlite3_context *context) {
+    NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
+    NSValue *funcValue = [userData objectForKey:FinalSelectorKey];
+    NSObject *target = [userData objectForKey:TargetKey];
     SEL func;
     [funcValue getValue:&func];
     
@@ -509,6 +534,106 @@ static void xFinalGlue(sqlite3_context *context) {
     [invocation setSelector:func];
     [invocation setArgument:&context atIndex:2];
     [invocation invoke];
+}
+
+
+- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError {
+    NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
+    [_functions removeObjectForKey:sig];
+    
+    NSMutableDictionary *functions;
+    if (function || step || final) {
+        functions = [NSMutableDictionary dictionary];
+        functions[TargetKey] = target;
+        if (function) {
+            functions[FuncSelectorKey] = [NSValue valueWithBytes:&function objCType:@encode(SEL)];
+        }
+        if (step) {
+            functions[StepSelectorKey] = [NSValue valueWithBytes:&step objCType:@encode(SEL)];
+        }
+        if (final) {
+            functions[FinalSelectorKey] = [NSValue valueWithBytes:&final objCType:@encode(SEL)];
+        }
+        _functions[sig] = functions;
+    }
+    
+    const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
+    void *pApp = (__bridge void *)functions;
+    void *xFunc = function ? SelectorFuncGlue : NULL;
+    void *xStep = step ? SelectorStepGlue : NULL;
+    void *xFinal = final ? SelectorFinalGlue : NULL;
+    int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
+    if (err != SQLITE_OK) {
+        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        [self logError:error];
+        SetError(outError, error);
+        return NO;
+    }
+    
+    return YES;
+}
+
+
+static void BlockFuncGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
+    NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
+    SQLPackRatFunc func = userData[FuncBlockKey];
+    if (func) {
+        func(context, argC, argsV);
+    }
+}
+
+
+static void BlockStepGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
+    NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
+    SQLPackRatStep step = userData[StepBlockKey];
+    if (step) {
+        step(context, argC, argsV);
+    }
+}
+
+
+static void BlockFinalGlue(sqlite3_context *context) {
+    NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
+    SQLPackRatFinal final = userData[FinalBlockKey];
+    if (final) {
+        final(context);
+    }
+}
+
+
+- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPackRatFunc)function step:(SQLPackRatStep)step final:(SQLPackRatFinal)final withError:(NSError **)outError {
+    NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
+    [_functions removeObjectForKey:sig];
+    
+    NSMutableDictionary *functions;
+    if (function || step || final) {
+        functions = [NSMutableDictionary dictionary];
+        if (function) {
+            functions[FuncBlockKey] = function;
+        }
+        if (step) {
+            functions[StepBlockKey] = step;
+        }
+        if (final) {
+            functions[FinalBlockKey] = final;
+        }
+        _functions[sig] = functions;
+    }
+    
+    const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
+    void *pApp = (__bridge void *)functions;
+    void *xFunc = function ? BlockFuncGlue : NULL;
+    void *xStep = step ? BlockStepGlue : NULL;
+    void *xFinal = final ? BlockFinalGlue : NULL;
+    int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
+    if (err != SQLITE_OK) {
+        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        [self logError:error];
+        SetError(outError, error);
+        return NO;
+    }
+    
+    return YES;
 }
 
 
@@ -529,48 +654,11 @@ static void xFinalGlue(sqlite3_context *context) {
 }
 
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError {
-    NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_functions removeObjectForKey:sig];
-    
-    NSMutableDictionary *functions;
-    if (function || step || final) {
-        functions = [NSMutableDictionary dictionary];
-        functions[@"Target"] = target;
-        if (function) {
-            functions[@"Func"] = [NSValue valueWithBytes:&function objCType:@encode(SEL)];
-        }
-        if (step) {
-            functions[@"Step"] = [NSValue valueWithBytes:&step objCType:@encode(SEL)];
-        }
-        if (final) {
-            functions[@"Final"] = [NSValue valueWithBytes:&final objCType:@encode(SEL)];
-        }
-        _functions[sig] = functions;
-    }
-    
-    const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
-    void *pApp = (__bridge void *)functions;
-    void *xFunc = function ? xFuncGlue :NULL;
-    void *xStep = step ? xStepGlue :NULL;
-    void *xFinal = final ? xFinalGlue :NULL;
-    int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
-    if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
-        [self logError:error];
-        SetError(outError, error);
-        return NO;
-    }
-    
-    return YES;
-}
-
-
 - (NSArray *)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSAssert(!(_refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
     
     NSError *error;
-    SQLPackRatStmt *stmt = [self stmtWithSQL:SQL bindingValues:values withError:&error];
+    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -594,7 +682,7 @@ static void xFinalGlue(sqlite3_context *context) {
     NSAssert(!(_refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
     
     NSError *error;
-    SQLPackRatStmt *stmt = [self stmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
+    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -643,7 +731,7 @@ static void xFinalGlue(sqlite3_context *context) {
 
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *stmt = [self stmtWithSQL:SQL bindingValues:values withError:&error];
+    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -665,7 +753,7 @@ static void xFinalGlue(sqlite3_context *context) {
 
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *stmt = [self stmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
+    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -797,7 +885,7 @@ static void xFinalGlue(sqlite3_context *context) {
 - (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPackRatAction)block withError:(NSError **)outError {
     NSError *error;
     
-    SQLPackRatTransaction *transaction = _transactionsEnabled ?[self transactionWithLabel :context] :nil;
+    SQLPackRatTransaction *transaction = _transactionsEnabled ? [self newTransactionWithLabel:context] : nil;
     if (transaction && ![transaction beginImmediateWithError:&error]) {
         SetError(outError, error);
         return NO;
