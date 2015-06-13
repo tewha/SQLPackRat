@@ -1,0 +1,19 @@
+//
+//  SQLPackRat.h
+//  SQLPackRat
+//
+//  Created by Steven Fisher on 2011/05/03.
+//  Copyright 2011 Steven Fisher. All rights reserved.
+//
+
+#if defined(TARGET_OS_PHONE) && TARGET_OS_PHONE
+#   if defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && (__IPHONE_OS_VERSION_MIN_REQUIRED < 60000)
+#       warning "Must be built for iOS SDK 6.0 and later."
+#   endif
+#endif
+
+
+#import "SQLPackRatDatabase.h"
+#import "SQLPackRatErrors.h"
+#import "SQLPackRatTransaction.h"
+#import "SQLPackRatStmt.h"
