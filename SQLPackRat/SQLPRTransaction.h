@@ -1,5 +1,5 @@
 //
-//  SQLPackRatTransaction.h
+//  SQLPRTransaction.h
 //  SQLPackRat
 //
 //  Created by Steven Fisher on 2011/05/03.

@@ -1,5 +1,5 @@
 //
-//  SQLPackRatStmt.h
+//  SQLPRStmt.h
 //  SQLPackRat
 //
 //  Created by Steven Fisher on 2011-04-29.
