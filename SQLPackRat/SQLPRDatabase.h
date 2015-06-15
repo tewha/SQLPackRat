@@ -27,6 +27,7 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 @property (nonatomic, readonly, assign) sqlite3 *sqlite3;
 @property (nonatomic, readwrite, assign) BOOL refuseMainThread;
 @property (nonatomic, readwrite, assign) BOOL transactionsEnabled;
+@property (nonatomic, assign) BOOL logErrors;
 
 - (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError NS_DESIGNATED_INITIALIZER;
 
@@ -40,6 +41,8 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
 - (void)close;
 
+/* SQL statement creation. */
+
 #if COMPATIBILITY_MODE
 - (SQLPackRatStmt *)newStmt;
 #endif
@@ -48,11 +51,18 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
 - (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 
+/* SQL transaction creation. */
+
 - (SQLPRTransaction *)newTransactionWithLabel:(NSString *)label;
 
+/* SQL statement execution */
 - (BOOL)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings withError:(NSError **)outError;
 
 - (void)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings completion:(SQLPRExecuteCompletionBlock)completion;
+
+- (BOOL)executeSQLFromPath:(NSString *)path bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
+
+- (BOOL)executeSQLNamed:(NSString *)name fromBundle:(NSBundle *)bundle bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
 - (NSNumber *)changesFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
@@ -61,16 +71,6 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 - (NSNumber *)insertUsingSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
 - (NSNumber *)insertUsingSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
-
-- (BOOL)executeSQLFromPath:(NSString *)path bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
-
-- (BOOL)executeSQLNamed:(NSString *)name fromBundle:(NSBundle *)bundle bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
-
-- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError;
-
-- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError;
-
-- (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError;
 
 - (NSArray *)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 
@@ -98,7 +98,15 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
 - (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPRTransactionBlock)block withError:(NSError **)outError;
 
-@property (nonatomic, assign) BOOL logErrors;
+/* Custom functions */
+
+- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError;
+
+- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError;
+
+- (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError;
+
+/* Other */
 
 - (BOOL)backupTo:(SQLPRDatabase *)destination withError:(NSError **)error;
 
