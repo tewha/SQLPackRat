@@ -6,10 +6,10 @@
 //  Copyright 2011 Steven Fisher. All rights reserved.
 //
 
-#import "SQLPackRatStmt.h"
+#import "SQLPRStmt.h"
 
-#import "SQLPackRatErrors.h"
-#import "SQLPackRatDatabase.h"
+#import "SQLPRErrors.h"
+#import "SQLPRDatabase.h"
 
 
 #define INTS_ARE_64BIT ((defined(__LP64__) && __LP64__) || (TARGET_OS_EMBEDDED && !TARGET_OS_IPHONE) || TARGET_OS_WIN32 || (defined(NS_BUILD_32_LIKE_64) && NS_BUILD_32_LIKE_64))
@@ -25,12 +25,12 @@ typedef NS_ENUM(NSInteger, SQLRatPackObjectType) {
 
 
 
-@interface SQLPackRatDatabase ()
+@interface SQLPRDatabase ()
 - (void)logError:(NSError *)error;
 @end
 
-@interface SQLPackRatStmt ()
-@property (nonatomic, readwrite, strong) SQLPackRatDatabase *database;
+@interface SQLPRStmt ()
+@property (nonatomic, readwrite, strong) SQLPRDatabase *database;
 @property (nonatomic, readwrite, assign) sqlite3_stmt *stmt;
 @property (nonatomic, readwrite, strong) NSString *current;
 @property (nonatomic, readwrite, assign) BOOL done;
@@ -42,7 +42,7 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-@implementation SQLPackRatStmt
+@implementation SQLPRStmt
 
 
 - (void)logError:(NSError *)error {
@@ -50,7 +50,7 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database {
+- (instancetype)initWithDatabase:(SQLPRDatabase *)database {
     self = [super init];
     if (!self) {
         return nil;
@@ -73,7 +73,7 @@ static inline void SetError(NSError **error, NSError *e) {
 - (NSError *)errorWithSQLPackRatErrorCode:(NSInteger)errorCode {
     const char *errMsg = sqlite3_errmsg([_database sqlite3]);
     NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@(errMsg), @"CurrentSQL":_current ?: @""};
-    NSError *error = [NSError errorWithDomain:SQLPackRatSQL3ErrorDomain code:errorCode userInfo:userInfo];
+    NSError *error = [NSError errorWithDomain:SQLPRSQL3ErrorDomain code:errorCode userInfo:userInfo];
     return error;
 }
 
@@ -201,7 +201,7 @@ static inline void SetError(NSError **error, NSError *e) {
             handled = NO;
     }
     if (!handled) {
-        NSError *error = [NSError errorWithDomain:SQLPackRatWrapperErrorDomain code:SQLPackRatWrapperErrorUnsupportedType userInfo:@{NSLocalizedDescriptionKey:@"wrapper doesn't support type", @"Value":value, @"ValueClass":NSStringFromClass([value class])}];
+        NSError *error = [NSError errorWithDomain:SQLPRPackRatErrorDomain code:SQLPRPackRatErrorUnsupportedType userInfo:@{NSLocalizedDescriptionKey:@"wrapper doesn't support type", @"Value":value, @"ValueClass":NSStringFromClass([value class])}];
         SetError(outError, error);
         return NO;
     }
@@ -461,7 +461,7 @@ static inline void SetError(NSError **error, NSError *e) {
     }
     if (![self haveRow]) {
         NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@"Read past end of table"};
-        error = [NSError errorWithDomain:SQLPackRatWrapperErrorDomain code:SQLITE_DONE userInfo:userInfo];
+        error = [NSError errorWithDomain:SQLPRPackRatErrorDomain code:SQLITE_DONE userInfo:userInfo];
         [self logError:error];
         if (outError) *outError = error;
         return nil;

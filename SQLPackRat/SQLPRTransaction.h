@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class SQLPackRatDatabase;
+@class SQLPRDatabase;
 
 typedef NS_ENUM(NSInteger, SQLPackRatTransactionStartMode) {
     SQLPackRatTransactionStartModeManually,
@@ -16,11 +16,11 @@ typedef NS_ENUM(NSInteger, SQLPackRatTransactionStartMode) {
     SQLPackRatTransactionStartModeAutomaticallyNow
 };
 
-@interface SQLPackRatTransaction : NSObject
+@interface SQLPRTransaction : NSObject
 
-- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label;
+- (instancetype)initWithDatabase:(SQLPRDatabase *)database label:(NSString *)label;
 
-- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError **)error;
+- (instancetype)initWithDatabase:(SQLPRDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError **)error;
 
 @property (nonatomic, readonly, strong) NSError *lastError;
 

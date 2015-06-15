@@ -1,5 +1,5 @@
 //
-//  SQLPackRatDatabase.h
+//  SQLPRDatabase.h
 //  SQLPackRat
 //
 //  Created by Steven Fisher on 2011-04-29.
@@ -9,20 +9,20 @@
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
 
-@class SQLPackRatDatabase;
-@class SQLPackRatStmt;
-@class SQLPackRatTransaction;
+@class SQLPRDatabase;
+@class SQLPRStmt;
+@class SQLPRTransaction;
 
-typedef BOOL(^SQLPackRatAction)(NSError **outError);
-typedef void(^SQLPackRatCompletion)(NSError *error);
-typedef void(^SQLPackRatInsertCompletion)(NSError *error, NSNumber *record);
-typedef void(^SQLPackRatRecordCompletion)(NSError *error, NSDictionary *record);
-typedef void(^SQLPackRatRecordsCompletion)(NSError *error, NSArray *records);
-typedef void(^SQLPackRatFunc)(sqlite3_context *context, int argC, sqlite3_value **argsV);
-typedef void(^SQLPackRatStep)(sqlite3_context *context, int argC, sqlite3_value **argsV);
-typedef void(^SQLPackRatFinal)(sqlite3_context *context);
+typedef BOOL(^SQLPRTransactionBlock)(NSError **outError);
+typedef void(^SQLPRExecuteCompletionBlock)(NSError *error);
+typedef void(^SQLPRInsertCompletionBlock)(NSError *error, NSNumber *record);
+typedef void(^SQLPRSelectCompletionBlock)(NSError *error, NSDictionary *record);
+typedef void(^SQLPRSelectFirstCompletionBlock)(NSError *error, NSArray *records);
+typedef void(^SQLPRCustomFuncBlock)(sqlite3_context *context, int argC, sqlite3_value **argsV);
+typedef void(^SQLPRCustomStepBlock)(sqlite3_context *context, int argC, sqlite3_value **argsV);
+typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
-@interface SQLPackRatDatabase : NSObject
+@interface SQLPRDatabase : NSObject
 
 @property (nonatomic, readonly, assign) sqlite3 *sqlite3;
 @property (nonatomic, readwrite, assign) BOOL refuseMainThread;
@@ -44,15 +44,15 @@ typedef void(^SQLPackRatFinal)(sqlite3_context *context);
 - (SQLPackRatStmt *)newStmt;
 #endif
 
-- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 
-- (SQLPackRatTransaction *)newTransactionWithLabel:(NSString *)label;
+- (SQLPRTransaction *)newTransactionWithLabel:(NSString *)label;
 
 - (BOOL)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings withError:(NSError **)outError;
 
-- (void)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings completion:(SQLPackRatCompletion)completion;
+- (void)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings completion:(SQLPRExecuteCompletionBlock)completion;
 
 - (NSNumber *)changesFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
@@ -68,7 +68,7 @@ typedef void(^SQLPackRatFinal)(sqlite3_context *context);
 
 - (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError;
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPackRatFunc)function step:(SQLPackRatStep)step final:(SQLPackRatFinal)final withError:(NSError **)outError;
+- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError;
 
 - (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError;
 
@@ -76,30 +76,30 @@ typedef void(^SQLPackRatFinal)(sqlite3_context *context);
 
 - (NSArray *)recordsFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (void)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPackRatRecordsCompletion)completion;
+- (void)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPRSelectFirstCompletionBlock)completion;
 
-- (void)recordsFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPackRatRecordsCompletion)completion;
+- (void)recordsFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPRSelectFirstCompletionBlock)completion;
 
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (void)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPackRatRecordCompletion)completion;
+- (void)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPRSelectCompletionBlock)completion;
 
-- (void)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPackRatRecordCompletion)completion;
+- (void)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPRSelectCompletionBlock)completion;
 
 - (NSNumber *)insertOrReplace:(NSDictionary *)values intoTable:(NSString *)table withError:(NSError **)error;
 
-- (void)insertOrReplace:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPackRatInsertCompletion)completion;
+- (void)insertOrReplace:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPRInsertCompletionBlock)completion;
 
 - (NSNumber *)insertOrAbort:(NSDictionary *)values intoTable:(NSString *)table withError:(NSError **)error;
 
-- (void)insertOrAbort:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPackRatInsertCompletion)completion;
+- (void)insertOrAbort:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPRInsertCompletionBlock)completion;
 
-- (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPackRatAction)block withError:(NSError **)outError;
+- (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPRTransactionBlock)block withError:(NSError **)outError;
 
 @property (nonatomic, assign) BOOL logErrors;
 
-- (BOOL)backupTo:(SQLPackRatDatabase *)destination withError:(NSError **)error;
+- (BOOL)backupTo:(SQLPRDatabase *)destination withError:(NSError **)error;
 
 @end

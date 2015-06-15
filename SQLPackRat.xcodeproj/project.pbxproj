@@ -9,31 +9,31 @@
 /* Begin PBXBuildFile section */
 		A7ECE5D91B2BA7CF00254107 /* libSQLPackRat-OSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE5CD1B2BA7CF00254107 /* libSQLPackRat-OSX.a */; };
 		A7ECE5F41B2BA7EF00254107 /* SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E71B2BA7EF00254107 /* SQLPackRat.h */; };
-		A7ECE5F51B2BA7EF00254107 /* SQLPackRatTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5E81B2BA7EF00254107 /* SQLPackRatTransaction.m */; };
-		A7ECE5F61B2BA7EF00254107 /* SQLPackRatTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E91B2BA7EF00254107 /* SQLPackRatTransaction.h */; };
-		A7ECE5F71B2BA7EF00254107 /* SQLPackRatStmt.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EA1B2BA7EF00254107 /* SQLPackRatStmt.m */; };
-		A7ECE5F81B2BA7EF00254107 /* SQLPackRatStmt.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EB1B2BA7EF00254107 /* SQLPackRatStmt.h */; };
-		A7ECE5F91B2BA7EF00254107 /* SQLPackRatErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EC1B2BA7EF00254107 /* SQLPackRatErrors.m */; };
-		A7ECE5FA1B2BA7EF00254107 /* SQLPackRatErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5ED1B2BA7EF00254107 /* SQLPackRatErrors.h */; };
-		A7ECE5FB1B2BA7EF00254107 /* SQLPackRatDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EE1B2BA7EF00254107 /* SQLPackRatDatabase.m */; };
-		A7ECE5FC1B2BA7EF00254107 /* SQLPackRatDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EF1B2BA7EF00254107 /* SQLPackRatDatabase.h */; };
+		A7ECE5F51B2BA7EF00254107 /* SQLPRTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5E81B2BA7EF00254107 /* SQLPRTransaction.m */; };
+		A7ECE5F61B2BA7EF00254107 /* SQLPRTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E91B2BA7EF00254107 /* SQLPRTransaction.h */; };
+		A7ECE5F71B2BA7EF00254107 /* SQLPRStmt.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EA1B2BA7EF00254107 /* SQLPRStmt.m */; };
+		A7ECE5F81B2BA7EF00254107 /* SQLPRStmt.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EB1B2BA7EF00254107 /* SQLPRStmt.h */; };
+		A7ECE5F91B2BA7EF00254107 /* SQLPRErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EC1B2BA7EF00254107 /* SQLPRErrors.m */; };
+		A7ECE5FA1B2BA7EF00254107 /* SQLPRErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5ED1B2BA7EF00254107 /* SQLPRErrors.h */; };
+		A7ECE5FB1B2BA7EF00254107 /* SQLPRDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EE1B2BA7EF00254107 /* SQLPRDatabase.m */; };
+		A7ECE5FC1B2BA7EF00254107 /* SQLPRDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EF1B2BA7EF00254107 /* SQLPRDatabase.h */; };
 		A7ECE5FD1B2BA7EF00254107 /* NSString+SQLPackRat.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5F01B2BA7EF00254107 /* NSString+SQLPackRat.m */; };
 		A7ECE5FE1B2BA7EF00254107 /* NSString+SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5F11B2BA7EF00254107 /* NSString+SQLPackRat.h */; };
 		A7ECE5FF1B2BA7EF00254107 /* NSNumber+SQLPackRat.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5F21B2BA7EF00254107 /* NSNumber+SQLPackRat.m */; };
 		A7ECE6001B2BA7EF00254107 /* NSNumber+SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5F31B2BA7EF00254107 /* NSNumber+SQLPackRat.h */; };
-		A7ECE6031B2BA7F600254107 /* SQLPackRatErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EC1B2BA7EF00254107 /* SQLPackRatErrors.m */; };
+		A7ECE6031B2BA7F600254107 /* SQLPRErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EC1B2BA7EF00254107 /* SQLPRErrors.m */; };
 		A7ECE6041B2BA7F600254107 /* NSNumber+SQLPackRat.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5F21B2BA7EF00254107 /* NSNumber+SQLPackRat.m */; };
-		A7ECE6051B2BA7F600254107 /* SQLPackRatTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5E81B2BA7EF00254107 /* SQLPackRatTransaction.m */; };
-		A7ECE6061B2BA7F600254107 /* SQLPackRatDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EE1B2BA7EF00254107 /* SQLPackRatDatabase.m */; };
+		A7ECE6051B2BA7F600254107 /* SQLPRTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5E81B2BA7EF00254107 /* SQLPRTransaction.m */; };
+		A7ECE6061B2BA7F600254107 /* SQLPRDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EE1B2BA7EF00254107 /* SQLPRDatabase.m */; };
 		A7ECE6071B2BA7F600254107 /* NSString+SQLPackRat.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5F01B2BA7EF00254107 /* NSString+SQLPackRat.m */; };
-		A7ECE6081B2BA7F600254107 /* SQLPackRatStmt.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EA1B2BA7EF00254107 /* SQLPackRatStmt.m */; };
+		A7ECE6081B2BA7F600254107 /* SQLPRStmt.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5EA1B2BA7EF00254107 /* SQLPRStmt.m */; };
 		A7ECE60B1B2BA7F600254107 /* NSString+SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5F11B2BA7EF00254107 /* NSString+SQLPackRat.h */; };
 		A7ECE60C1B2BA7F600254107 /* SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E71B2BA7EF00254107 /* SQLPackRat.h */; };
 		A7ECE60D1B2BA7F600254107 /* NSNumber+SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5F31B2BA7EF00254107 /* NSNumber+SQLPackRat.h */; };
-		A7ECE60E1B2BA7F600254107 /* SQLPackRatTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E91B2BA7EF00254107 /* SQLPackRatTransaction.h */; };
-		A7ECE60F1B2BA7F600254107 /* SQLPackRatDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EF1B2BA7EF00254107 /* SQLPackRatDatabase.h */; };
-		A7ECE6101B2BA7F600254107 /* SQLPackRatStmt.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EB1B2BA7EF00254107 /* SQLPackRatStmt.h */; };
-		A7ECE6111B2BA7F600254107 /* SQLPackRatErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5ED1B2BA7EF00254107 /* SQLPackRatErrors.h */; };
+		A7ECE60E1B2BA7F600254107 /* SQLPRTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E91B2BA7EF00254107 /* SQLPRTransaction.h */; };
+		A7ECE60F1B2BA7F600254107 /* SQLPRDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EF1B2BA7EF00254107 /* SQLPRDatabase.h */; };
+		A7ECE6101B2BA7F600254107 /* SQLPRStmt.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5EB1B2BA7EF00254107 /* SQLPRStmt.h */; };
+		A7ECE6111B2BA7F600254107 /* SQLPRErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5ED1B2BA7EF00254107 /* SQLPRErrors.h */; };
 		A7ECE61D1B2BAB4100254107 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE61C1B2BAB4100254107 /* main.swift */; };
 		A7ECE6221B2BAD0E00254107 /* libSQLPackRat-OSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE5CD1B2BA7CF00254107 /* libSQLPackRat-OSX.a */; };
 		A7ECE6241B2BAD1D00254107 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE6231B2BAD1D00254107 /* libsqlite3.dylib */; };
@@ -68,14 +68,14 @@
 		A7ECE5D81B2BA7CF00254107 /* SQLPackRatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SQLPackRatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7ECE5DE1B2BA7CF00254107 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7ECE5E71B2BA7EF00254107 /* SQLPackRat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPackRat.h; sourceTree = "<group>"; };
-		A7ECE5E81B2BA7EF00254107 /* SQLPackRatTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPackRatTransaction.m; sourceTree = "<group>"; };
-		A7ECE5E91B2BA7EF00254107 /* SQLPackRatTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPackRatTransaction.h; sourceTree = "<group>"; };
-		A7ECE5EA1B2BA7EF00254107 /* SQLPackRatStmt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPackRatStmt.m; sourceTree = "<group>"; };
-		A7ECE5EB1B2BA7EF00254107 /* SQLPackRatStmt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPackRatStmt.h; sourceTree = "<group>"; };
-		A7ECE5EC1B2BA7EF00254107 /* SQLPackRatErrors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPackRatErrors.m; sourceTree = "<group>"; };
-		A7ECE5ED1B2BA7EF00254107 /* SQLPackRatErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPackRatErrors.h; sourceTree = "<group>"; };
-		A7ECE5EE1B2BA7EF00254107 /* SQLPackRatDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPackRatDatabase.m; sourceTree = "<group>"; };
-		A7ECE5EF1B2BA7EF00254107 /* SQLPackRatDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPackRatDatabase.h; sourceTree = "<group>"; };
+		A7ECE5E81B2BA7EF00254107 /* SQLPRTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPRTransaction.m; sourceTree = "<group>"; };
+		A7ECE5E91B2BA7EF00254107 /* SQLPRTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPRTransaction.h; sourceTree = "<group>"; };
+		A7ECE5EA1B2BA7EF00254107 /* SQLPRStmt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPRStmt.m; sourceTree = "<group>"; };
+		A7ECE5EB1B2BA7EF00254107 /* SQLPRStmt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPRStmt.h; sourceTree = "<group>"; };
+		A7ECE5EC1B2BA7EF00254107 /* SQLPRErrors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPRErrors.m; sourceTree = "<group>"; };
+		A7ECE5ED1B2BA7EF00254107 /* SQLPRErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPRErrors.h; sourceTree = "<group>"; };
+		A7ECE5EE1B2BA7EF00254107 /* SQLPRDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPRDatabase.m; sourceTree = "<group>"; };
+		A7ECE5EF1B2BA7EF00254107 /* SQLPRDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPRDatabase.h; sourceTree = "<group>"; };
 		A7ECE5F01B2BA7EF00254107 /* NSString+SQLPackRat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SQLPackRat.m"; sourceTree = "<group>"; };
 		A7ECE5F11B2BA7EF00254107 /* NSString+SQLPackRat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SQLPackRat.h"; sourceTree = "<group>"; };
 		A7ECE5F21B2BA7EF00254107 /* NSNumber+SQLPackRat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNumber+SQLPackRat.m"; sourceTree = "<group>"; };
@@ -151,14 +151,14 @@
 			isa = PBXGroup;
 			children = (
 				A7ECE5E71B2BA7EF00254107 /* SQLPackRat.h */,
-				A7ECE5EF1B2BA7EF00254107 /* SQLPackRatDatabase.h */,
-				A7ECE5EE1B2BA7EF00254107 /* SQLPackRatDatabase.m */,
-				A7ECE5ED1B2BA7EF00254107 /* SQLPackRatErrors.h */,
-				A7ECE5EC1B2BA7EF00254107 /* SQLPackRatErrors.m */,
-				A7ECE5EB1B2BA7EF00254107 /* SQLPackRatStmt.h */,
-				A7ECE5EA1B2BA7EF00254107 /* SQLPackRatStmt.m */,
-				A7ECE5E91B2BA7EF00254107 /* SQLPackRatTransaction.h */,
-				A7ECE5E81B2BA7EF00254107 /* SQLPackRatTransaction.m */,
+				A7ECE5EF1B2BA7EF00254107 /* SQLPRDatabase.h */,
+				A7ECE5EE1B2BA7EF00254107 /* SQLPRDatabase.m */,
+				A7ECE5ED1B2BA7EF00254107 /* SQLPRErrors.h */,
+				A7ECE5EC1B2BA7EF00254107 /* SQLPRErrors.m */,
+				A7ECE5EB1B2BA7EF00254107 /* SQLPRStmt.h */,
+				A7ECE5EA1B2BA7EF00254107 /* SQLPRStmt.m */,
+				A7ECE5E91B2BA7EF00254107 /* SQLPRTransaction.h */,
+				A7ECE5E81B2BA7EF00254107 /* SQLPRTransaction.m */,
 			);
 			path = SQLPackRat;
 			sourceTree = "<group>";
@@ -210,10 +210,10 @@
 				A7ECE5FE1B2BA7EF00254107 /* NSString+SQLPackRat.h in Headers */,
 				A7ECE5F41B2BA7EF00254107 /* SQLPackRat.h in Headers */,
 				A7ECE6001B2BA7EF00254107 /* NSNumber+SQLPackRat.h in Headers */,
-				A7ECE5F61B2BA7EF00254107 /* SQLPackRatTransaction.h in Headers */,
-				A7ECE5FC1B2BA7EF00254107 /* SQLPackRatDatabase.h in Headers */,
-				A7ECE5F81B2BA7EF00254107 /* SQLPackRatStmt.h in Headers */,
-				A7ECE5FA1B2BA7EF00254107 /* SQLPackRatErrors.h in Headers */,
+				A7ECE5F61B2BA7EF00254107 /* SQLPRTransaction.h in Headers */,
+				A7ECE5FC1B2BA7EF00254107 /* SQLPRDatabase.h in Headers */,
+				A7ECE5F81B2BA7EF00254107 /* SQLPRStmt.h in Headers */,
+				A7ECE5FA1B2BA7EF00254107 /* SQLPRErrors.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,10 +224,10 @@
 				A7ECE60B1B2BA7F600254107 /* NSString+SQLPackRat.h in Headers */,
 				A7ECE60C1B2BA7F600254107 /* SQLPackRat.h in Headers */,
 				A7ECE60D1B2BA7F600254107 /* NSNumber+SQLPackRat.h in Headers */,
-				A7ECE60E1B2BA7F600254107 /* SQLPackRatTransaction.h in Headers */,
-				A7ECE60F1B2BA7F600254107 /* SQLPackRatDatabase.h in Headers */,
-				A7ECE6101B2BA7F600254107 /* SQLPackRatStmt.h in Headers */,
-				A7ECE6111B2BA7F600254107 /* SQLPackRatErrors.h in Headers */,
+				A7ECE60E1B2BA7F600254107 /* SQLPRTransaction.h in Headers */,
+				A7ECE60F1B2BA7F600254107 /* SQLPRDatabase.h in Headers */,
+				A7ECE6101B2BA7F600254107 /* SQLPRStmt.h in Headers */,
+				A7ECE6111B2BA7F600254107 /* SQLPRErrors.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,12 +358,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7ECE5F91B2BA7EF00254107 /* SQLPackRatErrors.m in Sources */,
+				A7ECE5F91B2BA7EF00254107 /* SQLPRErrors.m in Sources */,
 				A7ECE5FF1B2BA7EF00254107 /* NSNumber+SQLPackRat.m in Sources */,
-				A7ECE5F51B2BA7EF00254107 /* SQLPackRatTransaction.m in Sources */,
-				A7ECE5FB1B2BA7EF00254107 /* SQLPackRatDatabase.m in Sources */,
+				A7ECE5F51B2BA7EF00254107 /* SQLPRTransaction.m in Sources */,
+				A7ECE5FB1B2BA7EF00254107 /* SQLPRDatabase.m in Sources */,
 				A7ECE5FD1B2BA7EF00254107 /* NSString+SQLPackRat.m in Sources */,
-				A7ECE5F71B2BA7EF00254107 /* SQLPackRatStmt.m in Sources */,
+				A7ECE5F71B2BA7EF00254107 /* SQLPRStmt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,12 +379,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7ECE6031B2BA7F600254107 /* SQLPackRatErrors.m in Sources */,
+				A7ECE6031B2BA7F600254107 /* SQLPRErrors.m in Sources */,
 				A7ECE6041B2BA7F600254107 /* NSNumber+SQLPackRat.m in Sources */,
-				A7ECE6051B2BA7F600254107 /* SQLPackRatTransaction.m in Sources */,
-				A7ECE6061B2BA7F600254107 /* SQLPackRatDatabase.m in Sources */,
+				A7ECE6051B2BA7F600254107 /* SQLPRTransaction.m in Sources */,
+				A7ECE6061B2BA7F600254107 /* SQLPRDatabase.m in Sources */,
 				A7ECE6071B2BA7F600254107 /* NSString+SQLPackRat.m in Sources */,
-				A7ECE6081B2BA7F600254107 /* SQLPackRatStmt.m in Sources */,
+				A7ECE6081B2BA7F600254107 /* SQLPRStmt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

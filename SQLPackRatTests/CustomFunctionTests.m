@@ -16,10 +16,10 @@
 
 @implementation CustomFunctionTests
 
-- (SQLPackRatDatabase *)open:(NSError **)error {
+- (SQLPRDatabase *)open:(NSError **)error {
     NSError *e;
     NSString *databasePath = [NSTemporaryDirectory() stringByAppendingString:[NSUUID UUID].UUIDString];
-    SQLPackRatDatabase *database = [[SQLPackRatDatabase alloc] initWithPath:databasePath flags:SQLITE_OPEN_CREATE | SQLITE_OPEN_DELETEONCLOSE | SQLITE_OPEN_READWRITE vfs:nil error:&e];
+    SQLPRDatabase *database = [[SQLPRDatabase alloc] initWithPath:databasePath flags:SQLITE_OPEN_CREATE | SQLITE_OPEN_DELETEONCLOSE | SQLITE_OPEN_READWRITE vfs:nil error:&e];
     if (!database) {
         if (error) *error = e;
         return nil;
@@ -28,7 +28,7 @@
     return database;
 }
 
-- (BOOL)buildValuesTable:(NSArray *)values inDatabase:(SQLPackRatDatabase *)database error:(NSError **)error {
+- (BOOL)buildValuesTable:(NSArray *)values inDatabase:(SQLPRDatabase *)database error:(NSError **)error {
     NSError *e;
     if (![database executeSQL:@"CREATE TABLE \"Values\"(\"Value\" INTEGER);" bindingKeyValues:nil withError:&e]) {
         if (error) *error = e;
@@ -48,7 +48,7 @@
 
 - (void)testAggregateBlock {
     NSError *e;
-    SQLPackRatDatabase *database = [self open:&e];
+    SQLPRDatabase *database = [self open:&e];
     XCTAssertNotNil(database, @"Error opening database: %@", e);
     
     BOOL buildTablesOK = [self buildValuesTable:@[@1, @2, @3] inDatabase:database error:&e];

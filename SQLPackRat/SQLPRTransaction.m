@@ -6,9 +6,9 @@
 //  Copyright 2011 Steven Fisher. All rights reserved.
 //
 
-#import "SQLPackRatTransaction.h"
+#import "SQLPRTransaction.h"
 
-#import "SQLPackRatDatabase.h"
+#import "SQLPRDatabase.h"
 
 
 #ifndef DEBUG_TRANSACTIONS
@@ -16,10 +16,10 @@
 #endif
 
 
-@interface SQLPackRatTransaction ()
+@interface SQLPRTransaction ()
 @property (nonatomic, readwrite, strong) NSString *label;
 @property (nonatomic, readwrite, strong) NSError *lastError;
-@property (nonatomic, readwrite, strong) SQLPackRatDatabase *database;
+@property (nonatomic, readwrite, strong) SQLPRDatabase *database;
 @property (nonatomic, readwrite, assign) BOOL transaction;
 @end
 
@@ -29,10 +29,10 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-@implementation SQLPackRatTransaction
+@implementation SQLPRTransaction
 
 
-- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label {
+- (instancetype)initWithDatabase:(SQLPRDatabase *)database label:(NSString *)label {
     self = [super init];
     if (!self) {
         return nil;
@@ -43,7 +43,7 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError *__autoreleasing *)error {
+- (instancetype)initWithDatabase:(SQLPRDatabase *)database label:(NSString *)label startMode:(SQLPackRatTransactionStartMode)startMode withError:(NSError *__autoreleasing *)error {
     self = [super init];
     if (!self) {
         return nil;

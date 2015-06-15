@@ -13,7 +13,7 @@
 #endif
 
 
-#import "SQLPackRatDatabase.h"
-#import "SQLPackRatErrors.h"
-#import "SQLPackRatTransaction.h"
-#import "SQLPackRatStmt.h"
+#import "SQLPRDatabase.h"
+#import "SQLPRErrors.h"
+#import "SQLPRTransaction.h"
+#import "SQLPRStmt.h"

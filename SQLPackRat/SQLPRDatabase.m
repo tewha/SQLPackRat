@@ -1,16 +1,16 @@
 //
-//  SQLPackRatDatabase.m
+//  SQLPRDatabase.m
 //  SQLPackRat
 //
 //  Created by Steven Fisher on 2011-04-29.
 //  Copyright 2011 Steven Fisher. All rights reserved.
 //
 
-#import "SQLPackRatDatabase.h"
+#import "SQLPRDatabase.h"
 
-#import "SQLPackRatErrors.h"
-#import "SQLPackRatStmt.h"
-#import "SQLPackRatTransaction.h"
+#import "SQLPRErrors.h"
+#import "SQLPRStmt.h"
+#import "SQLPRTransaction.h"
 
 #ifndef SQLPACKRAT_LOG_ERRORS
 #if defined(DEBUG) && DEBUG
@@ -36,14 +36,14 @@ static NSString *FuncBlockKey = @"FuncBlock";
 static NSString *StepBlockKey = @"StepBlock";
 static NSString *FinalBlockKey = @"FinalBlock";
 
-@interface SQLPackRatDatabase ()
+@interface SQLPRDatabase ()
 @property (nonatomic, readwrite, strong) NSString *path;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *functions;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *attaches;
 @property (nonatomic, readwrite, weak) NSError *lastError;
 @end
 
-@implementation SQLPackRatDatabase {
+@implementation SQLPRDatabase {
     dispatch_queue_t _background;
 }
 
@@ -110,7 +110,7 @@ static inline long fromNSInteger(NSInteger i) {
 
 
 + (NSError *)errorWithCode:(NSInteger)code message:(NSString *)message {
-    return [NSError errorWithDomain:SQLPackRatSQL3ErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:message}];
+    return [NSError errorWithDomain:SQLPRSQL3ErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:message}];
 }
 
 
@@ -190,13 +190,13 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (SQLPackRatStmt *)newStmt {
-    return [[SQLPackRatStmt alloc] initWithDatabase:self];
+- (SQLPRStmt *)newStmt {
+    return [[SQLPRStmt alloc] initWithDatabase:self];
 }
 
 
-- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
-    SQLPackRatStmt *stmt = [[SQLPackRatStmt alloc] initWithDatabase:self];
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
+    SQLPRStmt *stmt = [[SQLPRStmt alloc] initWithDatabase:self];
     NSError *error;
     if (![stmt prepare:SQL remaining:nil withError:&error]) {
         [self logError:error];
@@ -212,8 +212,8 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (SQLPackRatStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
-    SQLPackRatStmt *stmt = [[SQLPackRatStmt alloc] initWithDatabase:self];
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
+    SQLPRStmt *stmt = [[SQLPRStmt alloc] initWithDatabase:self];
     NSError *error;
     if (![stmt prepare:SQL remaining:nil withError:&error]) {
         [self logError:error];
@@ -229,17 +229,17 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (SQLPackRatTransaction *)newTransactionWithLabel:(NSString *)label {
-    return [[SQLPackRatTransaction alloc] initWithDatabase:self label:label];
+- (SQLPRTransaction *)newTransactionWithLabel:(NSString *)label {
+    return [[SQLPRTransaction alloc] initWithDatabase:self label:label];
 }
 
 
-typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outError);
+typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
 
 
 - (BOOL)executeSQL:(NSString *)SQL bindBlock:(SQLPackRatBindBlock)bindBlock withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *st = [self newStmt];
+    SQLPRStmt *st = [self newStmt];
     NSString *current = SQL;
     for (;;) {
         NSString *rest;
@@ -281,7 +281,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (NSNumber *)changesFromSQL:(NSString *)SQL bindBlock:(SQLPackRatBindBlock)bindBlock withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *st = [self newStmt];
+    SQLPRStmt *st = [self newStmt];
     NSString *current = SQL;
     NSInteger changes = 0;
     for (;;) {
@@ -325,7 +325,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (BOOL)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatBindBlock bind = ^BOOL (SQLPackRatStmt *stmt, NSError **outE) {
+    SQLPackRatBindBlock bind = ^BOOL (SQLPRStmt *stmt, NSError **outE) {
         NSError *e;
         if (![stmt bindKeyValues:keyValues withError:&e]) {
             if (outE) { *outE = e; }
@@ -346,7 +346,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (void)runInBackground:(dispatch_block_t)background {
     @synchronized(self) {
-        if (!_background) _background = dispatch_queue_create("SQLPackRatDatabase", 0);
+        if (!_background) _background = dispatch_queue_create("SQLPRDatabase", 0);
         dispatch_async(_background, ^{
             background();
         });
@@ -354,7 +354,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 }
 
 
-- (void)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings completion:(SQLPackRatCompletion)completion {
+- (void)executeSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)bindings completion:(SQLPRExecuteCompletionBlock)completion {
     [self runInBackground:^{
         NSError *e;
         [self executeSQL:SQL bindingKeyValues:bindings withError:&e];
@@ -364,7 +364,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (NSNumber *)changesFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatBindBlock bind = ^BOOL (SQLPackRatStmt *stmt, NSError **outE) {
+    SQLPackRatBindBlock bind = ^BOOL (SQLPRStmt *stmt, NSError **outE) {
         NSError *e;
         if (![stmt bindKeyValues:keyValues withError:&e]) {
             if (outE) { *outE = e; }
@@ -386,7 +386,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (NSNumber *)changesFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatBindBlock bind = ^BOOL (SQLPackRatStmt *stmt, NSError **outE) {
+    SQLPackRatBindBlock bind = ^BOOL (SQLPRStmt *stmt, NSError **outE) {
         NSError *e;
         if (![stmt bindArray:values withError:&e]) {
             if (outE) { *outE = e; }
@@ -408,7 +408,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (NSNumber *)insertUsingSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatBindBlock bind = ^BOOL (SQLPackRatStmt *stmt, NSError **outE) {
+    SQLPackRatBindBlock bind = ^BOOL (SQLPRStmt *stmt, NSError **outE) {
         NSError *e;
         if (![stmt bindKeyValues:keyValues withError:&e]) {
             if (outE) { *outE = e; }
@@ -432,7 +432,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPackRatStmt *statement, NSError **outErro
 
 - (NSNumber *)insertUsingSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatBindBlock bind = ^BOOL (SQLPackRatStmt *stmt, NSError **outE) {
+    SQLPackRatBindBlock bind = ^BOOL (SQLPRStmt *stmt, NSError **outE) {
         NSError *e;
         if (![stmt bindArray:values withError:&e]) {
             if (outE) { *outE = e; }
@@ -576,7 +576,7 @@ static void SelectorFinalGlue(sqlite3_context *context) {
 
 static void BlockFuncGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
     NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
-    SQLPackRatFunc func = userData[FuncBlockKey];
+    SQLPRCustomFuncBlock func = userData[FuncBlockKey];
     if (func) {
         func(context, argC, argsV);
     }
@@ -585,7 +585,7 @@ static void BlockFuncGlue(sqlite3_context *context, int argC, sqlite3_value **ar
 
 static void BlockStepGlue(sqlite3_context *context, int argC, sqlite3_value **argsV) {
     NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
-    SQLPackRatStep step = userData[StepBlockKey];
+    SQLPRCustomStepBlock step = userData[StepBlockKey];
     if (step) {
         step(context, argC, argsV);
     }
@@ -594,14 +594,14 @@ static void BlockStepGlue(sqlite3_context *context, int argC, sqlite3_value **ar
 
 static void BlockFinalGlue(sqlite3_context *context) {
     NSDictionary *userData = (__bridge id)sqlite3_user_data(context);
-    SQLPackRatFinal final = userData[FinalBlockKey];
+    SQLPRCustomFinalBlock final = userData[FinalBlockKey];
     if (final) {
         final(context);
     }
 }
 
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPackRatFunc)function step:(SQLPackRatStep)step final:(SQLPackRatFinal)final withError:(NSError **)outError {
+- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
     [_functions removeObjectForKey:sig];
     
@@ -658,7 +658,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     NSAssert(!(_refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
     
     NSError *error;
-    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
+    SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -682,7 +682,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     NSAssert(!(_refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
     
     NSError *error;
-    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
+    SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -702,7 +702,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (void)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPackRatRecordsCompletion)completion {
+- (void)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPRSelectFirstCompletionBlock)completion {
     [self runInBackground:^{
         NSError *e;
         NSArray *records = [self recordsFromSQL:SQL bindingValues:values withError:&e];
@@ -716,7 +716,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (void)recordsFromSQL:(NSString *)SQL
       bindingKeyValues:(NSDictionary *)keyValues
-            completion:(SQLPackRatRecordsCompletion)completion {
+            completion:(SQLPRSelectFirstCompletionBlock)completion {
     [self runInBackground:^{
         NSError *e;
         NSArray *records = [self recordsFromSQL:SQL bindingKeyValues:keyValues withError:&e];
@@ -731,7 +731,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
+    SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -753,7 +753,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
-    SQLPackRatStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
+    SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
     if (!stmt) {
         [self logError:error];
         if (outError) *outError = error;
@@ -773,7 +773,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (void)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPackRatRecordCompletion)completion {
+- (void)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPRSelectCompletionBlock)completion {
     
     [self runInBackground:^{
         NSError *e;
@@ -787,7 +787,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (void)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPackRatRecordCompletion)completion {
+- (void)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPRSelectCompletionBlock)completion {
     [self runInBackground:^{
         NSError *e;
         NSDictionary *record = [self firstRecordFromSQL:SQL bindingKeyValues:keyValues withError:&e];
@@ -823,7 +823,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (void)insertOrReplace:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPackRatInsertCompletion)completion {
+- (void)insertOrReplace:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPRInsertCompletionBlock)completion {
     [self runInBackground:^{
         NSError *e;
         NSNumber *record = [self insertOrReplace:values intoTable:table withError:&e];
@@ -859,7 +859,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (void)insertOrAbort:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPackRatInsertCompletion)completion {
+- (void)insertOrAbort:(NSDictionary *)values intoTable:(NSString *)table completion:(SQLPRInsertCompletionBlock)completion {
     [self runInBackground:^{
         NSError *e;
         NSNumber *record = [self insertOrAbort:values intoTable:table withError:&e];
@@ -882,10 +882,10 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPackRatAction)block withError:(NSError **)outError {
+- (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPRTransactionBlock)block withError:(NSError **)outError {
     NSError *error;
     
-    SQLPackRatTransaction *transaction = _transactionsEnabled ? [self newTransactionWithLabel:context] : nil;
+    SQLPRTransaction *transaction = _transactionsEnabled ? [self newTransactionWithLabel:context] : nil;
     if (transaction && ![transaction beginImmediateWithError:&error]) {
         SetError(outError, error);
         return NO;
@@ -908,7 +908,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (BOOL)backupTo:(SQLPackRatDatabase *)destination withError:(NSError **)error {
+- (BOOL)backupTo:(SQLPRDatabase *)destination withError:(NSError **)error {
     sqlite3 *other = destination.sqlite3;
     sqlite3_backup *backup = sqlite3_backup_init(other, "main", _sqlite3, "main");
     if (!backup) {

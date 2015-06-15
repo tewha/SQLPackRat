@@ -1,5 +1,5 @@
 //
-//  SQLPackRatErrors.h
+//  SQLPRErrors.h
 //  SQLPackRat
 //
 //  Created by Steven Fisher on 2015-06-12.
@@ -9,13 +9,13 @@
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
 
-extern NSString *SQLPackRatSQL3ErrorDomain;
-extern NSString *SQLPackRatWrapperErrorDomain;
+extern NSString *SQLPRSQL3ErrorDomain;
+extern NSString *SQLPRPackRatErrorDomain;
 
 typedef NS_ENUM(NSInteger, SQLPackRatWrapperError) {
-    SQLPackRatWrapperErrorSwuccess = 0,
-    SQLPackRatWrapperErrorNoRecords,
-    SQLPackRatWrapperErrorUnsupportedType
+    SQLPRPackRatErrorSuccess = 0,
+    SQLPRPackRatErrorNoRecords,
+    SQLPRPackRatErrorUnsupportedType
 };
 
 typedef NS_ENUM(NSInteger, SQLPackRatSQL3Error) {

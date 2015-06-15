@@ -47,7 +47,7 @@ func Fail(code:Error, message:String) {
 var e: NSError?
 
 let parameters = NSUserDefaults.standardUserDefaults().dictionaryRepresentation()
-let database = SQLPackRatDatabase()
+let database = SQLPRDatabase()
 
 let databasePathOptional = parameters["database"] as? String
 if databasePathOptional == nil {

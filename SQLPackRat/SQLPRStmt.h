@@ -9,11 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
 
-@class SQLPackRatDatabase;
+@class SQLPRDatabase;
 
-@interface SQLPackRatStmt : NSObject<NSFastEnumeration>
+@interface SQLPRStmt : NSObject<NSFastEnumeration>
 
-- (instancetype)initWithDatabase:(SQLPackRatDatabase *)database;
+- (instancetype)initWithDatabase:(SQLPRDatabase *)database;
 
 - (BOOL)prepare:(NSString *)SQL remaining:(NSString **)outRemaining withError:(NSError **)outError;
 
