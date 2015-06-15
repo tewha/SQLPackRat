@@ -537,7 +537,7 @@ static void SelectorFinalGlue(sqlite3_context *context) {
 }
 
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError {
+- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
     [_functions removeObjectForKey:sig];
     
@@ -601,7 +601,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError {
+- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
     [_functions removeObjectForKey:sig];
     

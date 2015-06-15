@@ -66,9 +66,9 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
 - (BOOL)executeSQLNamed:(NSString *)name fromBundle:(NSBundle *)bundle bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError;
+- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError;
 
-- (BOOL)createFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError;
+- (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError;
 
 - (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError;
 

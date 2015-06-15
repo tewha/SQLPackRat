@@ -54,7 +54,7 @@
     BOOL buildTablesOK = [self buildValuesTable:@[@1, @2, @3] inDatabase:database error:&e];
     XCTAssertTrue(buildTablesOK, @"Error building table: %@", e);
     
-    BOOL success = [database createFunctionNamed:@"mySum" argCount:1 func:nil step:^(sqlite3_context *context, int argC, sqlite3_value **argsV) {
+    BOOL success = [database addFunctionNamed:@"mySum" argCount:1 func:nil step:^(sqlite3_context *context, int argC, sqlite3_value **argsV) {
         sqlite3_int64 *sumPtr = (sqlite3_int64 *)sqlite3_aggregate_context(context, sizeof(sqlite3_int64));
         int64_t this = sqlite3_value_int64(argsV[0]);
         *sumPtr += this;
