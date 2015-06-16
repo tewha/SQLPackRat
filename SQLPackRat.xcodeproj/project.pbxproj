@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A753BE681B2FA83A00E9D59C /* BasicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A753BE671B2FA83A00E9D59C /* BasicTests.m */; };
 		A7ECE5D91B2BA7CF00254107 /* libSQLPackRat-OSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECE5CD1B2BA7CF00254107 /* libSQLPackRat-OSX.a */; };
 		A7ECE5F41B2BA7EF00254107 /* SQLPackRat.h in Headers */ = {isa = PBXBuildFile; fileRef = A7ECE5E71B2BA7EF00254107 /* SQLPackRat.h */; };
 		A7ECE5F51B2BA7EF00254107 /* SQLPRTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = A7ECE5E81B2BA7EF00254107 /* SQLPRTransaction.m */; };
@@ -64,6 +65,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A753BE671B2FA83A00E9D59C /* BasicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasicTests.m; sourceTree = "<group>"; };
 		A7ECE5CD1B2BA7CF00254107 /* libSQLPackRat-OSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libSQLPackRat-OSX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7ECE5D81B2BA7CF00254107 /* SQLPackRatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SQLPackRatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7ECE5DE1B2BA7CF00254107 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				A7ECE5DD1B2BA7CF00254107 /* Supporting Files */,
+				A753BE671B2FA83A00E9D59C /* BasicTests.m */,
 				A7ECE6261B2BBDD600254107 /* CustomFunctionTests.m */,
 			);
 			path = SQLPackRatTests;
@@ -371,6 +374,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A753BE681B2FA83A00E9D59C /* BasicTests.m in Sources */,
 				A7ECE6271B2BBDD600254107 /* CustomFunctionTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
