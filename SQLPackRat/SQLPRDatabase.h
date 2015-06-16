@@ -49,6 +49,10 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
 - (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
 
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues tail:(NSString **)tail withError:(NSError **)outError;
+
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values tail:(NSString **)tail withError:(NSError **)outError;
+
 - (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError;
 
 /* SQL transaction creation. */
@@ -87,6 +91,8 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 - (void)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values completion:(SQLPRSelectCompletionBlock)completion;
 
 - (void)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues completion:(SQLPRSelectCompletionBlock)completion;
+
+- (NSArray *)insertRecords:(NSArray *)records intoTable:(NSString *)table withError:(NSError **)error;
 
 - (NSNumber *)insertOrReplace:(NSDictionary *)values intoTable:(NSString *)table withError:(NSError **)error;
 
