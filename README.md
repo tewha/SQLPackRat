@@ -8,6 +8,6 @@ This is a work in progress.
 
 ## Requirements
 
-SQLPackRat requires the modern Objective-C runtime, and therefore runs only 32- or 64-bit iOS targets, but only on 64-bit OS X targets.
+SQLPackRat requires the modern Objective-C runtime. It can be used by 32- or 64-bit iOS targets, but only supports 64-bit targets on OS X.
 
 Little effort will be spent keeping SQLPackRat compatible with older compilers.
