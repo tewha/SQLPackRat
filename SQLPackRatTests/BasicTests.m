@@ -22,12 +22,12 @@
     [super setUp];
     
     NSError *e;
-    NSString *baseDirectory = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"net.tewha.essendene.tests"];
+    NSString *baseDirectory = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"net.tewha.sqlpackrat.tests"];
     
     [[NSFileManager defaultManager] createDirectoryAtPath:baseDirectory withIntermediateDirectories:YES attributes:nil error:&e];
     
     NSString *validPath = [baseDirectory stringByAppendingPathComponent:@"test.db"];
-    _database = [[SQLPRDatabase alloc] initWithPath:validPath flags:(SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE) vfs:nil error:&e];
+    _database = [[SQLPRDatabase alloc] initWithPath:validPath flags:(SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_DELETEONCLOSE) vfs:nil error:&e];
     XCTAssertNotNil(_database, @"No database returned.");
     
 }
