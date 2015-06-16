@@ -44,7 +44,7 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 /* SQL statement creation. */
 
 #if COMPATIBILITY_MODE
-- (SQLPackRatStmt *)newStmt;
+- (SQLPRStmt *)newStmt;
 #endif
 
 - (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
