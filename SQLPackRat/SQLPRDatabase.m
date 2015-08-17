@@ -196,6 +196,10 @@ static inline long fromNSInteger(NSInteger i) {
 
 
 - (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
+    return [self newStmtWithSQL:SQL bindingKeyValues:keyValues tail:nil withError:outError];
+}
+
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues tail:(NSString **)tail withError:(NSError **)outError {
     SQLPRStmt *stmt = [[SQLPRStmt alloc] initWithDatabase:self];
     NSError *error;
     if (![stmt prepare:SQL remaining:nil withError:&error]) {
@@ -213,6 +217,11 @@ static inline long fromNSInteger(NSInteger i) {
 
 
 - (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
+    return [self newStmtWithSQL:SQL bindingValues:values tail:nil withError:outError];
+}
+
+
+- (SQLPRStmt *)newStmtWithSQL:(NSString *)SQL bindingValues:(NSArray *)values tail:(NSString **)tail withError:(NSError **)outError {
     SQLPRStmt *stmt = [[SQLPRStmt alloc] initWithDatabase:self];
     NSError *error;
     if (![stmt prepare:SQL remaining:nil withError:&error]) {
@@ -820,6 +829,21 @@ static void BlockFinalGlue(sqlite3_context *context) {
     }
     
     return result;
+}
+
+
+- (NSArray *)insertRecords:(NSArray *)records intoTable:(NSString *)table withError:(NSError **)error {
+    NSError *e;
+    NSMutableArray *IDs = [NSMutableArray array];
+    for (NSDictionary *record in records) {
+        NSNumber *ID = [self insertOrAbort:record intoTable:table withError:&e];
+        if (!ID) {
+            if (error) *error = e;
+            return nil;
+        }
+        [IDs addObject:ID];
+    }
+    return [IDs copy];
 }
 
 
