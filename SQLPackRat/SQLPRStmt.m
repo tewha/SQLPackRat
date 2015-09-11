@@ -113,6 +113,11 @@ static inline void SetError(NSError **error, NSError *e) {
 
 - (BOOL)closeWithError:(NSError **)outError {
     sqlite3_finalize(_stmt);
+    /* Intentionally ignore sqlite3_finalize's error. Per sqlite documentation:
+     
+     If the most recent evaluation of statement S failed, then sqlite3_finalize(S) returns the appropriate error code or extended error code.
+     
+     We already handled that error; we don't want it again. */
     _stmt = NULL;
     self.current = nil;
     return YES;
