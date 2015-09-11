@@ -137,8 +137,7 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-- (BOOL)openPath:(NSString *)path
-           error:(NSError **)outError {
+- (BOOL)openPath:(NSString *)path error:(NSError **)outError {
     return [self openPath:path flags:SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX vfs:nil error:outError];
 }
 
@@ -252,9 +251,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
     NSString *current = SQL;
     for (;;) {
         NSString *rest;
-        if (![st prepare:current
-               remaining:&rest
-               withError:&error]) {
+        if (![st prepare:current remaining:&rest withError:&error]) {
             [self logError:error];
             SetError(outError, error);
             return NO;
@@ -295,9 +292,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
     NSInteger changes = 0;
     for (;;) {
         NSString *rest;
-        if (![st prepare:current
-               remaining:&rest
-               withError:&error]) {
+        if (![st prepare:current remaining:&rest withError:&error]) {
             [self logError:error];
             SetError(outError, error);
             return nil;
