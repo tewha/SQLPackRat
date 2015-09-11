@@ -114,13 +114,12 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-+ (NSError *)errorWithSQLPackRatErrorCode:(NSInteger)errorCode message:(NSString *)message {
-    
++ (NSError *)errorWithSQL3ErrorCode:(NSInteger)errorCode message:(NSString *)message {
     return [[self class] errorWithCode:errorCode message:message];
 }
 
 
-- (NSError *)errorWithSQLPackRatErrorCode:(NSInteger)errorCode {
+- (NSError *)errorWithSQL3ErrorCode:(NSInteger)errorCode {
     return [[self class] errorWithCode:errorCode message:@(sqlite3_errmsg(_sqlite3))];
 }
 
@@ -149,7 +148,7 @@ static inline long fromNSInteger(NSInteger i) {
     const char *zVFS = [VFS cStringUsingEncoding:NSUTF8StringEncoding];
     int err = sqlite3_open_v2(zPath, &_sqlite3, flags, zVFS);
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
         SetError(outError, error);
         sqlite3_close(_sqlite3);
@@ -568,7 +567,7 @@ static void SelectorFinalGlue(sqlite3_context *context) {
     void *xFinal = final ? SelectorFinalGlue : NULL;
     int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
         SetError(outError, error);
         return NO;
@@ -631,7 +630,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     void *xFinal = final ? BlockFinalGlue : NULL;
     int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
         SetError(outError, error);
         return NO;
@@ -645,7 +644,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
     int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, NULL, NULL, NULL, NULL);
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
         SetError(outError, error);
         return NO;

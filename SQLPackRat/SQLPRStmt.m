@@ -70,7 +70,7 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-- (NSError *)errorWithSQLPackRatErrorCode:(NSInteger)errorCode {
+- (NSError *)errorWithSQL3ErrorCode:(NSInteger)errorCode {
     const char *errMsg = sqlite3_errmsg([_database sqlite3]);
     NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@(errMsg), @"CurrentSQL":_current ?: @""};
     NSError *error = [NSError errorWithDomain:SQLPRSQL3ErrorDomain code:errorCode userInfo:userInfo];
@@ -97,7 +97,7 @@ static inline void SetError(NSError **error, NSError *e) {
     NSUInteger consumed = tail ? ((intptr_t)tail - (intptr_t)head) : 0;
     self.current = consumed > 0 ? [[NSString alloc] initWithBytes:head length:consumed encoding:NSUTF8StringEncoding] : nil;
     if (err != SQLITE_OK) {
-        error = [self errorWithSQLPackRatErrorCode:err];
+        error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
         SetError(outError, error);
         return NO;
@@ -127,7 +127,7 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)resetWithError:(NSError **)outError {
     int err = sqlite3_reset(_stmt);
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
         return NO;
     }
@@ -138,7 +138,7 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)clearBindingsWithError:(NSError **)outError {
     int err = sqlite3_clear_bindings(_stmt);
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
         return NO;
     }
@@ -211,7 +211,7 @@ static inline void SetError(NSError **error, NSError *e) {
         return NO;
     }
     if (err != SQLITE_OK) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
         return NO;
     }
@@ -262,7 +262,7 @@ static inline void SetError(NSError **error, NSError *e) {
     _done = (err == SQLITE_DONE);
     _haveRow = (err == SQLITE_ROW);
     if (err < 100) {
-        NSError *error = [self errorWithSQLPackRatErrorCode:err];
+        NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
         return NO;
     }
