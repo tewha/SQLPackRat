@@ -22,6 +22,9 @@ typedef void(^SQLPRCustomFuncBlock)(sqlite3_context *context, int argC, sqlite3_
 typedef void(^SQLPRCustomStepBlock)(sqlite3_context *context, int argC, sqlite3_value **argsV);
 typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 
+/** A SQLPRDatabase tracks a database from open to close.
+ 
+ Each SQLPRStatement maintains a strong reference to the SQLPRDatabase. This may seem a little backwards, but it keeps the database open as long as a statement references it. */
 @interface SQLPRDatabase : NSObject
 
 @property (nonatomic, readonly, assign) sqlite3 *sqlite3;

@@ -16,6 +16,9 @@ typedef NS_ENUM(NSInteger, SQLPackRatTransactionStartMode) {
     SQLPackRatTransactionStartModeAutomaticallyNow
 };
 
+/** A SQLPRTransaction represents a database transaction.
+ 
+ Transactions must be explicitly started and committed. If a transaction is deallocated prior to being committed, it will be rolled back. */
 @interface SQLPRTransaction : NSObject
 
 - (instancetype)initWithDatabase:(SQLPRDatabase *)database label:(NSString *)label;

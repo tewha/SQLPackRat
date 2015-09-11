@@ -11,6 +11,7 @@
 
 @class SQLPRDatabase;
 
+/** A SQLPRTransaction represents a running SQL statement. */
 @interface SQLPRStmt : NSObject<NSFastEnumeration>
 
 - (instancetype)initWithDatabase:(SQLPRDatabase *)database;
