@@ -68,32 +68,23 @@ static inline long fromNSInteger(NSInteger i) {
 }
 
 
-#if COMPATIBILITY_MODE
 - (instancetype)init {
     self = [super init];
-    if (!self) {
-        return nil;
-    }
-    _functions = [NSMutableDictionary dictionary];
-    _attaches = [NSMutableDictionary dictionary];
-    _logErrors = SQLPACKRAT_LOG_ERRORS;
-    _transactionsEnabled = !SQLPACKRAT_DISABLE_TRANSACTIONS;
-    return self;
-}
-#endif
-
-
-
-- (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError {
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
     
     _functions = [NSMutableDictionary dictionary];
     _attaches = [NSMutableDictionary dictionary];
     _logErrors = SQLPACKRAT_LOG_ERRORS;
     _transactionsEnabled = !SQLPACKRAT_DISABLE_TRANSACTIONS;
+    
+    return self;
+}
+
+
+- (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError {
+    self = [self init];
+    if (!self) {
+        return nil;
+    }
     
     NSError *e;
     if (![self openPath:path flags:flags vfs:VFS error:&e]) {

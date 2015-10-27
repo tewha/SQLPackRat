@@ -32,7 +32,7 @@ typedef void(^SQLPRCustomFinalBlock)(sqlite3_context *context);
 @property (nonatomic, readwrite, assign) BOOL transactionsEnabled;
 @property (nonatomic, assign) BOOL logErrors;
 
-- (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPath:(NSString *)path flags:(int)flags vfs:(NSString *)VFS error:(NSError **)outError;
 
 - (NSInteger)schemaVersion;
 
