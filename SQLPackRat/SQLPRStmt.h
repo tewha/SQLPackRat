@@ -26,7 +26,7 @@
 
 - (BOOL)bind:(NSObject *)value toIndex:(NSInteger)binding withError:(NSError **)outError;
 
-- (BOOL)bindKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError;
+- (BOOL)bindKeyValues:(NSDictionary<NSString *, id> *)keyValues withError:(NSError **)outError;
 
 - (BOOL)bindArray:(NSArray *)values withError:(NSError **)outError;
 
@@ -55,6 +55,6 @@
 
 - (NSArray *)contentsWithError:(NSError **)outError;
 
-- (NSDictionary *)nextRecord:(NSError **)outError;
+- (NSDictionary<NSString *, id> *)nextRecord:(NSError **)outError;
 
 @end
