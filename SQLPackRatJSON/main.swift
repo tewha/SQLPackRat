@@ -38,96 +38,94 @@ func + <K,V>(left: Dictionary<K,V>, right: Dictionary<K,V>)
     return map
 }
 
-func Fail(code:Error, message:String) {
+@noreturn func Fail(code:Error, message:String) {
     let data = message.stringByAppendingString("\n").dataUsingEncoding(NSUTF8StringEncoding)!
     NSFileHandle.fileHandleWithStandardError().writeData(data)
     exit(code.rawValue)
 }
 
-var e: NSError?
-
 let parameters = NSUserDefaults.standardUserDefaults().dictionaryRepresentation()
-let database = SQLPRDatabase()
 
-let databasePathOptional = parameters["database"] as? String
-if databasePathOptional == nil {
-    Fail(Error.DatabaseMissing, "Error opening database: no path")
+guard let databasePath = (parameters["database"] as? String) else {
+    Fail(Error.DatabaseMissing, message: "Error opening database: no path")
 }
-let databasePath = databasePathOptional!
 
-if !database.openPath(databasePath.stringByExpandingTildeInPath, flags: SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, vfs: nil, error: &e) {
-    Fail(Error.DatabaseOpen, String(format:"Error opening database: %@: %@", databasePath, e!.localizedDescription))
+let database:SQLPRDatabase;
+do {
+    database = try SQLPRDatabase(path: databasePath, flags: SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, vfs: nil);
+} catch var error as NSError {
+    Fail(Error.DatabaseOpen, message: String(format:"Error opening database: %@: %@", databasePath, error.localizedDescription))
 }
 
 // Build bindings
 var bindings = [String:AnyObject]()
 let bindingsPath = parameters["bindings"] as? String
 if let path = bindingsPath {
-    let optionalData = NSData(contentsOfFile: path, options: nil, error: &e)
-    if optionalData == nil {
-        Fail(Error.BindRead, String(format:"Error reading bindings %@: %@", path, e!.localizedDescription))
+    let data: NSData
+    do {
+        data = try NSData(contentsOfFile: path, options: [])
+    } catch var error as NSError {
+        Fail(Error.BindRead, message: String(format:"Error reading bindings %@: %@", path, error.localizedDescription))
     }
-    let data = optionalData!
-    let deserialized:AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: &e)
-    let bindingsFromFileOptional:[String:AnyObject]? = deserialized as? [String:AnyObject]
-    if bindingsFromFileOptional == nil {
-        Fail(Error.BindDeserialize, String(format:"Error deserializing bindings %@: %@", path, e!.localizedDescription))
+    let bindingsFromFile:Dictionary<String, AnyObject>
+    do {
+        bindingsFromFile = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as! Dictionary<String, AnyObject>
+    } catch var error as NSError {
+        Fail(Error.BindDeserialize, message: String(format:"Error deserializing bindings %@: %@", path, error.localizedDescription))
     }
-    let bindingsFromFile = bindingsFromFileOptional!
     bindings = bindings + bindingsFromFile
 }
 
 // Get the SQL to run.
-var querySQL = parameters["query"] as? String
-if querySQL == nil {
-    let queryPathOptional = parameters["querypath"] as? String
-    if queryPathOptional == nil {
-        Fail(Error.QueryMissing, "Need -query or -querypath")
+let SQL:String
+if let query = parameters["query"] as? String {
+    SQL = query;
+} else {
+    guard let queryPath = parameters["querypath"] as? String else {
+        Fail(Error.QueryMissing, message: "Need -query or -querypath")
     }
-    var path = queryPathOptional!
-    querySQL = String(contentsOfFile:path.stringByExpandingTildeInPath, encoding:NSUTF8StringEncoding, error: &e)
-    if querySQL == nil {
-        Fail(Error.QueryRead, String(format:"Error reading -querypath %@: %@", path, e!.localizedDescription))
+    do {
+        SQL = try String(contentsOfFile:(queryPath as NSString).stringByExpandingTildeInPath, encoding:NSUTF8StringEncoding)
+    } catch var error as NSError {
+        Fail(Error.QueryRead, message: String(format:"Error reading -querypath %@: %@", queryPath, error.localizedDescription))
     }
 }
 
 // Run the SQL, capturing the resulting records.
-let recordsOptional = database.recordsFromSQL(querySQL, bindingKeyValues: bindings, withError: &e)
-if recordsOptional == nil {
-    Fail(Error.QueryExec, String(format:"Error running query: %@", e!.localizedDescription))
+let records:Array<AnyObject>
+do {
+    records = try database.recordsFromSQL(SQL, bindingKeyValues: bindings);
+} catch var error as NSError {
+    Fail(Error.QueryExec, message: String(format:"Error running query: %@", error.localizedDescription))
 }
-let records = recordsOptional!
 
 // What we're writing depends on what we're passed.
 // If we're passed an -input, it's a dictionary with the records inserted as -key
 // If we're passed only a -key, it's a dictionary with key:records
 // If we're not passed an input or a key, it's an array.
 let object:AnyObject
-let inputPath = (parameters["input"] as? String) ?? (parameters["in"] as? String)
-if let path = inputPath {
-    let dataOptional = NSData(contentsOfFile: path.stringByExpandingTildeInPath, options: nil, error: &e)
-    if dataOptional == nil {
-        Fail(Error.InputRead, String(format:"Error reading -input %@: %@", path, e!.localizedDescription))
+if let path = (parameters["input"] as? String) ?? (parameters["in"] as? String) {
+    let dataOptional: NSData?
+    do {
+        dataOptional = try NSData(contentsOfFile: (path as NSString).stringByExpandingTildeInPath, options: [])
+    } catch var error as NSError {
+        Fail(Error.InputRead, message: String(format:"Error reading -input %@: %@", path, error.localizedDescription))
     }
     let data = dataOptional!
     
-    let objectOptional:AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: &e)
-    if objectOptional == nil {
-        Fail(Error.InputDeserialize, String(format:"Error deserializing %@: %@", path, e!.localizedDescription))
+    do {
+        object = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers)
+    } catch var error as NSError {
+        Fail(Error.InputDeserialize, message: String(format:"Error deserializing %@: %@", path, error.localizedDescription))
     }
-    object = objectOptional!
     
-    let keyOptional = parameters["key"] as? String
-    if keyOptional == nil {
-        Fail(Error.KeyMissing, String(format:"-key required if -input specified"))
+    guard let key = parameters["key"] as? String else {
+        Fail(Error.KeyMissing, message: String(format:"-key required if -input specified"))
     }
-    let key = keyOptional!
     
-    let dictionaryOptional = object as? NSMutableDictionary
-    if dictionaryOptional == nil {
-        Fail(Error.InputFormat, String(format:"-input %@ was not a dictionary: %@", path, e!.localizedDescription))
+    guard let dictionary = object as? NSMutableDictionary else {
+        Fail(Error.InputFormat, message: String(format:"-input %@ was not a dictionary", path))
     }
-    let dictionary = dictionaryOptional!
     dictionary[key] = records
     
 } else {
@@ -139,20 +137,28 @@ if let path = inputPath {
 }
 
 // Serialize the object to JSON.
-let serializedOptional:NSData? = NSJSONSerialization.dataWithJSONObject(object, options: NSJSONWritingOptions.PrettyPrinted, error: &e)
-if serializedOptional == nil {
-    Fail(Error.OutputSerialize, String(format:"Error serializing output: %@", e!.localizedDescription))
+let JSON:String;
+do {
+    let serialized = try NSJSONSerialization.dataWithJSONObject(object, options: NSJSONWritingOptions.PrettyPrinted)
+    guard let string = String(data:serialized, encoding:NSUTF8StringEncoding) else {
+        Fail(Error.OutputWrite, message: String(format:"Error converting output to string"))
+    }
+    JSON = string;
+} catch var error as NSError {
+    Fail(Error.OutputSerialize, message: String(format:"Error serializing output: %@", error.localizedDescription))
 }
-let serialized = serializedOptional!
+
 
 // Write out the result.
 let outputPath = (parameters["output"] as? String) ?? (parameters["out"] as? String)
 if let path = outputPath {
     // …to a file
-    if !serialized.writeToFile(path.stringByExpandingTildeInPath, options:NSDataWritingOptions.DataWritingAtomic, error:&e) {
-        Fail(Error.OutputWrite, String(format:"Error writing output %@: %@", path, e!.localizedDescription))
+    do {
+        try JSON.writeToFile((path as NSString).stringByExpandingTildeInPath, atomically:true, encoding: NSUTF8StringEncoding)
+    } catch var error as NSError {
+        Fail(Error.OutputWrite, message: String(format:"Error writing output %@: %@", path, error.localizedDescription))
     }
 } else {
     // …or to stdout
-    println(NSString(data:serialized, encoding:NSUTF8StringEncoding))
+    print(JSON)
 }
