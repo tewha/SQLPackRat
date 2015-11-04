@@ -547,7 +547,7 @@
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				PRODUCT_NAME = "SQLPackRat-iOS";
+				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -557,7 +557,7 @@
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				PRODUCT_NAME = "SQLPackRat-iOS";
+				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
