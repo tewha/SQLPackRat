@@ -466,7 +466,7 @@ static inline void SetError(NSError **error, NSError *e) {
     }
     if (![self haveRow]) {
         NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@"Read past end of table"};
-        error = [NSError errorWithDomain:SQLPRPackRatErrorDomain code:SQLITE_DONE userInfo:userInfo];
+        error = [NSError errorWithDomain:SQLPRSQL3ErrorDomain code:SQLPackRatSQL3ErrorDone userInfo:userInfo];
         [self logError:error];
         if (outError) *outError = error;
         return nil;

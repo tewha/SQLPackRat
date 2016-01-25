@@ -723,6 +723,21 @@ static void BlockFinalGlue(sqlite3_context *context) {
 }
 
 
+- (NSDictionary *)firstRecordFromStmt:(SQLPRStmt *)stmt withError:(NSError **)outError {
+    NSError *error;
+    NSDictionary *record = [stmt nextRecord:&error];
+    if (!record) {
+        if ([error.domain isEqual:SQLPRSQL3ErrorDomain] && (error.code == SQLPackRatSQL3ErrorDone)) {
+            error = [NSError errorWithDomain:SQLPRPackRatErrorDomain code:SQLPRPackRatErrorNoRecords userInfo:@{NSLocalizedDescriptionKey: @"No records match query.", NSUnderlyingErrorKey:error}];
+        }
+        if (outError) *outError = error;
+        return nil;
+    }
+    
+    return record;
+}
+
+
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
@@ -732,7 +747,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
         return nil;
     }
     
-    NSDictionary *record = [stmt nextRecord:&error];
+    NSDictionary *record = [self firstRecordFromStmt:stmt withError:&error];
     if (!record) {
         [self logError:error];
         if (outError) *outError = error;
@@ -754,7 +769,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
         return nil;
     }
     
-    NSDictionary *record = [stmt nextRecord:&error];
+    NSDictionary *record = [self firstRecordFromStmt:stmt withError:&error];
     if (!record) {
         [self logError:error];
         if (outError) *outError = error;
