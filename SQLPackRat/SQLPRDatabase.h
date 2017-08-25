@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
 
+#ifndef COMPATIBILITY_MODE
+#define COMPATIBILITY_MODE 0
+#endif
+
 @class SQLPRDatabase;
 @class SQLPRStmt;
 @class SQLPRTransaction;
