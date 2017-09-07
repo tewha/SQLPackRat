@@ -52,10 +52,8 @@ Pod::Spec.new do |s|
   #  profile URL.
   #
 
-  s.author             = { "Steven Fisher" => "email@address.com" }
-  # Or just: s.author    = "Steven Fisher"
-  # s.authors            = { "Steven Fisher" => "email@address.com" }
-  # s.social_media_url   = "http://twitter.com/Steven Fisher"
+  s.author             = { "Steven Fisher" => "tewha@me.com" }
+  s.social_media_url   = "http://twitter.com/tewha"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -67,8 +65,8 @@ Pod::Spec.new do |s|
   # s.platform     = :ios, "5.0"
 
   #  When using multiple platforms
-  # s.ios.deployment_target = "5.0"
-  # s.osx.deployment_target = "10.7"
+  s.ios.deployment_target = "8.0"
+  s.osx.deployment_target = "10.10"
   # s.watchos.deployment_target = "2.0"
   # s.tvos.deployment_target = "9.0"
 
@@ -121,6 +119,7 @@ Pod::Spec.new do |s|
 
   # s.library   = "iconv"
   # s.libraries = "iconv", "xml2"
+  s.libraries = "sqlite3"
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
