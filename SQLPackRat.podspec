@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "SQLPackRat"
-  s.version      = "1.0.0"
+  s.version      = "0.5.0"
   s.summary      = "Simple Objective-C wrapper for SQLite."
 
   # This description is used to generate tags and improve search results.
