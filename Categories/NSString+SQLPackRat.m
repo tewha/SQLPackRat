@@ -9,7 +9,7 @@
 #import "NSString+SQLPackRat.h"
 
 #import <Foundation/Foundation.h>
-#import "sqlite3.h"
+#import <sqlite3.h>
 
 @implementation NSString (SQLPackRat)
 
