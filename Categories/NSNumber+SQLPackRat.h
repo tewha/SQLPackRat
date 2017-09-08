@@ -7,12 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <sqlite3.h>
 
 @interface NSNumber (SQLPackRat)
 
-+ (instancetype)numberWithSqliteInt64:(sqlite3_int64)value;
-- (instancetype)initWithSqliteInt64:(sqlite3_int64)value;
-- (sqlite3_int64)sqliteInt64Value;
++ (instancetype)numberWithSqliteInt64:(int64_t)value;
+- (instancetype)initWithSqliteInt64:(int64_t)value;
+- (int64_t)sqliteInt64Value;
 
 @end

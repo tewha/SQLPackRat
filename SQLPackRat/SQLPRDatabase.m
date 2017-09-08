@@ -12,6 +12,8 @@
 #import "SQLPRStmt.h"
 #import "SQLPRTransaction.h"
 
+#import <sqlite3.h>
+
 #ifndef SQLPACKRAT_LOG_ERRORS
 #if defined(DEBUG) && DEBUG
 #define SQLPACKRAT_LOG_ERRORS DEBUG
@@ -727,7 +729,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     NSError *error;
     NSDictionary *record = [stmt nextRecord:&error];
     if (!record) {
-        if ([error.domain isEqual:SQLPRSQL3ErrorDomain] && (error.code == SQLPackRatSQL3ErrorDone)) {
+        if ([error.domain isEqual:SQLPRSQL3ErrorDomain] && (error.code == SQLITE_DONE)) {
             error = [NSError errorWithDomain:SQLPRPackRatErrorDomain code:SQLPRPackRatErrorNoRecords userInfo:@{NSLocalizedDescriptionKey: @"No records match query.", NSUnderlyingErrorKey:error}];
         }
         if (outError) *outError = error;

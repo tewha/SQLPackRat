@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <sqlite3.h>
 
 #ifndef COMPATIBILITY_MODE
 #define COMPATIBILITY_MODE 0
@@ -16,6 +15,10 @@
 @class SQLPRDatabase;
 @class SQLPRStmt;
 @class SQLPRTransaction;
+
+typedef struct sqlite3_context sqlite3_context;
+typedef struct Mem sqlite3_value;
+typedef struct sqlite3 sqlite3;
 
 typedef BOOL(^SQLPRTransactionBlock)(NSError **outError);
 typedef void(^SQLPRExecuteCompletionBlock)(NSError *error);

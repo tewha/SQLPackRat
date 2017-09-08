@@ -33,7 +33,7 @@
     return str;
 }
 
-+ (instancetype)stringWithSqliteInt64:(sqlite3_int64)value {
++ (instancetype)stringWithSqliteInt64:(int64_t)value {
     return [NSString stringWithFormat:@"%lld", value];
 }
 
