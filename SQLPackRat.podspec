@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "SQLPackRat"
-  s.version      = "0.5.0"
+  s.version      = "0.5.1"
   s.summary      = "Simple Objective-C wrapper for SQLite."
   s.description  = <<-DESC
                    SQLPackRat is a simple Objective-C wrapper for SQLite.
