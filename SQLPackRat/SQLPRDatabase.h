@@ -17,7 +17,7 @@
 @class SQLPRTransaction;
 
 typedef struct sqlite3_context sqlite3_context;
-typedef struct Mem sqlite3_value;
+typedef struct sqlite3_value sqlite3_value;
 typedef struct sqlite3 sqlite3;
 
 typedef BOOL(^SQLPRTransactionBlock)(NSError **outError);
