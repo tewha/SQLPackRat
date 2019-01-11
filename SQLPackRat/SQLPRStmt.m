@@ -13,7 +13,11 @@
 
 #import <sqlite3.h>
 
-#define INTS_ARE_64BIT ((defined(__LP64__) && __LP64__) || (TARGET_OS_EMBEDDED && !TARGET_OS_IPHONE) || TARGET_OS_WIN32 || (defined(NS_BUILD_32_LIKE_64) && NS_BUILD_32_LIKE_64))
+#if ((defined(__LP64__) && __LP64__) || (TARGET_OS_EMBEDDED && !TARGET_OS_IPHONE) || TARGET_OS_WIN32 || (defined(NS_BUILD_32_LIKE_64) && NS_BUILD_32_LIKE_64))
+#   define INTS_ARE_64BIT 1
+#else
+#   define INTS_ARE_64BIT 0
+#endif
 
 typedef NS_ENUM(NSInteger, SQLRatPackObjectType) {
     SQLRatPackObjectTypeUnknown,
