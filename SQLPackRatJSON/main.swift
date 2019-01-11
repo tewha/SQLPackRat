@@ -53,7 +53,7 @@ guard let databasePath = (parameters["database"] as? String) else {
 let database:SQLPRDatabase;
 do {
     database = try SQLPRDatabase(path: databasePath, flags: SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, vfs: nil);
-} catch var error as NSError {
+} catch let error as NSError {
     Fail(Error.databaseOpen, message: String(format:"Error opening database: %@: %@", databasePath, error.localizedDescription))
 }
 
@@ -64,13 +64,13 @@ if let path = bindingsPath {
     let data: Data
     do {
         data = try Data(contentsOf: URL(fileURLWithPath: path), options: [])
-    } catch var error as NSError {
+    } catch let error as NSError {
         Fail(Error.bindRead, message: String(format:"Error reading bindings %@: %@", path, error.localizedDescription))
     }
     let bindingsFromFile:Dictionary<String, AnyObject>
     do {
         bindingsFromFile = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) as! Dictionary<String, AnyObject>
-    } catch var error as NSError {
+    } catch let error as NSError {
         Fail(Error.bindDeserialize, message: String(format:"Error deserializing bindings %@: %@", path, error.localizedDescription))
     }
     bindings = bindings + bindingsFromFile
@@ -86,7 +86,7 @@ if let query = parameters["query"] as? String {
     }
     do {
         SQL = try String(contentsOfFile:(queryPath as NSString).expandingTildeInPath, encoding:String.Encoding.utf8)
-    } catch var error as NSError {
+    } catch let error as NSError {
         Fail(Error.queryRead, message: String(format:"Error reading -querypath %@: %@", queryPath, error.localizedDescription))
     }
 }
@@ -95,7 +95,7 @@ if let query = parameters["query"] as? String {
 let records:Array<AnyObject>
 do {
     records = try database.records(fromSQL: SQL, bindingKeyValues: bindings) as Array<AnyObject>;
-} catch var error as NSError {
+} catch let error as NSError {
     Fail(Error.queryExec, message: String(format:"Error running query: %@", error.localizedDescription))
 }
 
@@ -108,14 +108,14 @@ if let path = (parameters["input"] as? String) ?? (parameters["in"] as? String) 
     let dataOptional: Data?
     do {
         dataOptional = try Data(contentsOf: URL(fileURLWithPath: (path as NSString).expandingTildeInPath), options: [])
-    } catch var error as NSError {
+    } catch let error as NSError {
         Fail(Error.inputRead, message: String(format:"Error reading -input %@: %@", path, error.localizedDescription))
     }
     let data = dataOptional!
     
     do {
         object = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)
-    } catch var error as NSError {
+    } catch let error as NSError {
         Fail(Error.inputDeserialize, message: String(format:"Error deserializing %@: %@", path, error.localizedDescription))
     }
     
@@ -144,7 +144,7 @@ do {
         Fail(Error.outputWrite, message: String(format:"Error converting output to string"))
     }
     JSON = string;
-} catch var error as NSError {
+} catch let error as NSError {
     Fail(Error.outputSerialize, message: String(format:"Error serializing output: %@", error.localizedDescription))
 }
 
@@ -155,7 +155,7 @@ if let path = outputPath {
     // …to a file
     do {
         try JSON.write(toFile: (path as NSString).expandingTildeInPath, atomically:true, encoding: String.Encoding.utf8)
-    } catch var error as NSError {
+    } catch let error as NSError {
         Fail(Error.outputWrite, message: String(format:"Error writing output %@: %@", path, error.localizedDescription))
     }
 } else {
