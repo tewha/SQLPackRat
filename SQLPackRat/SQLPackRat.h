@@ -12,7 +12,7 @@
 #   endif
 #endif
 
-
+#import <sqlite3.h>
 #import "SQLPRDatabase.h"
 #import "SQLPRErrors.h"
 #import "SQLPRTransaction.h"
