@@ -19,9 +19,6 @@
 
 - (instancetype)initWithSqliteInt64:(int64_t)value {
     self = [self initWithLongLong:value];
-    if (self) {
-        
-    }
     return self;
 }
 

@@ -120,7 +120,7 @@ static inline long fromNSInteger(NSInteger i) {
 - (NSInteger)schemaVersion {
     NSError *error;
     NSDictionary *record = [self firstRecordFromSQL:@"pragma schema_version;" bindingValues:nil withError:&error];
-    if (!record) {
+    if (record == nil) {
         [self logError:error];
         return 0;
     }
@@ -342,7 +342,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
 
 - (void)runInBackground:(dispatch_block_t)background {
     @synchronized(self) {
-        if (!_background) _background = dispatch_queue_create("SQLPRDatabase", 0);
+        if (_background == NULL) _background = dispatch_queue_create("SQLPRDatabase", 0);
         dispatch_async(_background, ^{
             background();
         });
@@ -370,7 +370,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
     };
     
     NSNumber *changes = [self changesFromSQL:SQL bindBlock:bind withError:&error];
-    if (!changes) {
+    if (changes == nil) {
         
         [self logError:error];
         SetError(outError, error);
@@ -392,7 +392,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
     };
     
     NSNumber *changes = [self changesFromSQL:SQL bindBlock:bind withError:&error];
-    if (!changes) {
+    if (changes == nil) {
         
         [self logError:error];
         SetError(outError, error);
@@ -453,7 +453,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
 - (BOOL)executeSQLFromPath:(NSString *)path bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
     NSString *SQL = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
-    if (!SQL) {
+    if (SQL == nil) {
         [self logError:error];
         SetError(outError, error);
         return NO;
@@ -655,14 +655,14 @@ static void BlockFinalGlue(sqlite3_context *context) {
     
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
-    if (!stmt) {
+    if (stmt == nil) {
         [self logError:error];
         if (outError) *outError = error;
         return nil;
     }
     
     NSArray *contents = [stmt contentsWithError:&error];
-    if (!contents) {
+    if (contents == nil) {
         [self logError:error];
         SetError(outError, error);
         [stmt closeWithError:NULL];
@@ -679,14 +679,14 @@ static void BlockFinalGlue(sqlite3_context *context) {
     
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
-    if (!stmt) {
+    if (stmt == nil) {
         [self logError:error];
         if (outError) *outError = error;
         return nil;
     }
     
     NSArray *contents = [stmt contentsWithError:&error];
-    if (!contents) {
+    if (contents == nil) {
         [self logError:error];
         SetError(outError, error);
         [stmt closeWithError:NULL];
@@ -728,7 +728,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 - (NSDictionary *)firstRecordFromStmt:(SQLPRStmt *)stmt withError:(NSError **)outError {
     NSError *error;
     NSDictionary *record = [stmt nextRecord:&error];
-    if (!record) {
+    if (record == nil) {
         if ([error.domain isEqual:SQLPRSQL3ErrorDomain] && (error.code == SQLITE_DONE)) {
             error = [NSError errorWithDomain:SQLPRPackRatErrorDomain code:SQLPRPackRatErrorNoRecords userInfo:@{NSLocalizedDescriptionKey: @"No records match query.", NSUnderlyingErrorKey:error}];
         }
@@ -743,14 +743,14 @@ static void BlockFinalGlue(sqlite3_context *context) {
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
-    if (!stmt) {
+    if (stmt == nil) {
         [self logError:error];
         if (outError) *outError = error;
         return nil;
     }
     
     NSDictionary *record = [self firstRecordFromStmt:stmt withError:&error];
-    if (!record) {
+    if (record == nil) {
         [self logError:error];
         if (outError) *outError = error;
         [stmt closeWithError:NULL];
@@ -765,14 +765,14 @@ static void BlockFinalGlue(sqlite3_context *context) {
 - (NSDictionary *)firstRecordFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
-    if (!stmt) {
+    if (stmt == nil) {
         [self logError:error];
         if (outError) *outError = error;
         return nil;
     }
     
     NSDictionary *record = [self firstRecordFromStmt:stmt withError:&error];
-    if (!record) {
+    if (record == nil) {
         [self logError:error];
         if (outError) *outError = error;
         [stmt closeWithError:NULL];
@@ -825,7 +825,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     NSString *SQL = [NSString stringWithFormat:@"INSERT OR REPLACE INTO \"%@\"(\"%@\") VALUES(%@);", table, [columns componentsJoinedByString:@"\",\""], [bindings componentsJoinedByString:@","]];
     
     NSNumber *result = [self insertUsingSQL:SQL bindingValues:values withError:&e];
-    if (!result) {
+    if (result == nil) {
         if (error) *error = e;
         return nil;
     }
@@ -839,7 +839,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     NSMutableArray *IDs = [NSMutableArray array];
     for (NSDictionary *record in records) {
         NSNumber *ID = [self insertOrAbort:record intoTable:table withError:&e];
-        if (!ID) {
+        if (ID == nil) {
             if (error) *error = e;
             return nil;
         }
@@ -876,7 +876,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     NSString *SQL = [NSString stringWithFormat:@"INSERT OR ABORT INTO \"%@\"(\"%@\") VALUES(%@);", table, [columns componentsJoinedByString:@"\",\""], [bindings componentsJoinedByString:@","]];
     
     NSNumber *result = [self insertUsingSQL:SQL bindingValues:values withError:&e];
-    if (!result) {
+    if (result == nil) {
         if (error) *error = e;
         return nil;
     }
@@ -937,7 +937,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 - (BOOL)backupTo:(SQLPRDatabase *)destination withError:(NSError **)error {
     sqlite3 *other = destination.sqlite3;
     sqlite3_backup *backup = sqlite3_backup_init(other, "main", _sqlite3, "main");
-    if (!backup) {
+    if (backup == NULL) {
         NSError *e = [[destination class] errorWithCode:sqlite3_errcode(other) message:@(sqlite3_errmsg(other))];
         [destination logError:e];
         if (error) *error = e;
