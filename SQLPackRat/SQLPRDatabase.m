@@ -853,8 +853,8 @@ static void BlockFinalGlue(sqlite3_context *context) {
     [self runInBackground:^{
         NSError *e;
         NSNumber *record = [self insertOrReplace:values intoTable:table withError:&e];
-        if (record) {
-            completion(nil,record);
+        if (record != nil) {
+            completion(nil, record);
         } else {
             completion(e,nil);
         }
@@ -889,8 +889,8 @@ static void BlockFinalGlue(sqlite3_context *context) {
     [self runInBackground:^{
         NSError *e;
         NSNumber *record = [self insertOrAbort:values intoTable:table withError:&e];
-        if (record) {
-            completion(nil,record);
+        if (record != nil) {
+            completion(nil, record);
         } else {
             completion(e,nil);
         }
