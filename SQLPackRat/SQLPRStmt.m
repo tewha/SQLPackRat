@@ -181,7 +181,7 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)bind:(NSObject *)value toIndex:(NSInteger)binding withError:(NSError **)outError {
     BOOL handled = YES;
     int err = SQLITE_MISUSE;
-    int type = [self sqliteTypeOfNSObject:value];
+    SQLRatPackObjectType type = [self sqliteTypeOfNSObject:value];
     switch (type) {
         case SQLRatPackObjectTypeNull:
             err = sqlite3_bind_null(_stmt, (int)binding);
