@@ -31,6 +31,7 @@ typedef NS_ENUM(NSInteger, SQLPackRatTransactionStartMode) {
 - (BOOL)beginWithError:(NSError **)outError;
 - (BOOL)commitWithError:(NSError **)outError;
 - (BOOL)rollbackWithError:(NSError **)outError;
-- (BOOL)isOpen;
+
+@property (assign, readonly, nonatomic, getter=isOpen) BOOL open;
 
 @end

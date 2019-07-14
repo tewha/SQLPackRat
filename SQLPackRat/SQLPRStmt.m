@@ -51,7 +51,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (void)logError:(NSError *)error {
-    [_database logError:error];
+    [self.database logError:error];
 }
 
 
@@ -76,8 +76,8 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (NSError *)errorWithSQL3ErrorCode:(NSInteger)errorCode {
-    const char *errMsg = sqlite3_errmsg([_database sqlite3]);
-    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@(errMsg), @"CurrentSQL":_current ?: @""};
+    const char *errMsg = sqlite3_errmsg([self.database sqlite3]);
+    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:@(errMsg), @"CurrentSQL":self.current ?: @""};
     NSError *error = [NSError errorWithDomain:SQLPRSQL3ErrorDomain code:errorCode userInfo:userInfo];
     return error;
 }
@@ -93,12 +93,14 @@ static inline void SetError(NSError **error, NSError *e) {
         if (outRemaining) { *outRemaining = SQL; }
         return NO;
     }
-    sqlite3 *sqlite3 = [_database sqlite3];
+    sqlite3 *sqlite3 = [self.database sqlite3];
     NSData *sqlData = [SQL dataUsingEncoding:NSUTF8StringEncoding];
     const char *head = [sqlData bytes];
     const char *tail = NULL;
     NSUInteger length = [sqlData length];
-    int err = sqlite3_prepare_v2(sqlite3, head, (int)length, &_stmt, &tail);
+    sqlite3_stmt *stmt = NULL;
+    int err = sqlite3_prepare_v2(sqlite3, head, (int)length, &stmt, &tail);
+    self.stmt = stmt;
     NSUInteger consumed = tail ? ((intptr_t)tail - (intptr_t)head) : 0;
     self.current = consumed > 0 ? [[NSString alloc] initWithBytes:head length:consumed encoding:NSUTF8StringEncoding] : nil;
     if (err != SQLITE_OK) {
@@ -107,7 +109,7 @@ static inline void SetError(NSError **error, NSError *e) {
         SetError(outError, error);
         return NO;
     }
-    
+
     if (outRemaining) {
         *outRemaining = [[NSString alloc] initWithBytes:tail length:length - consumed encoding:NSUTF8StringEncoding];
     }
@@ -117,20 +119,20 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (BOOL)closeWithError:(NSError **)outError {
-    sqlite3_finalize(_stmt);
+    sqlite3_finalize(self.stmt);
     /* Intentionally ignore sqlite3_finalize's error. Per sqlite documentation:
      
      If the most recent evaluation of statement S failed, then sqlite3_finalize(S) returns the appropriate error code or extended error code.
      
      We already handled that error; we don't want it again. */
-    _stmt = NULL;
+    self.stmt = NULL;
     self.current = nil;
     return YES;
 }
 
 
 - (BOOL)resetWithError:(NSError **)outError {
-    int err = sqlite3_reset(_stmt);
+    int err = sqlite3_reset(self.stmt);
     if (err != SQLITE_OK) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
@@ -141,7 +143,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (BOOL)clearBindingsWithError:(NSError **)outError {
-    int err = sqlite3_clear_bindings(_stmt);
+    int err = sqlite3_clear_bindings(self.stmt);
     if (err != SQLITE_OK) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
@@ -184,27 +186,27 @@ static inline void SetError(NSError **error, NSError *e) {
     SQLRatPackObjectType type = [self sqliteTypeOfNSObject:value];
     switch (type) {
         case SQLRatPackObjectTypeNull:
-            err = sqlite3_bind_null(_stmt, (int)binding);
+            err = sqlite3_bind_null(self.stmt, (int)binding);
             break;
         case SQLRatPackObjectTypeText:{
             NSString *string = (NSString *)value;
             NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
-            err = sqlite3_bind_text(_stmt, (int)binding, [data bytes], (int)[data length], SQLITE_TRANSIENT);
+            err = sqlite3_bind_text(self.stmt, (int)binding, [data bytes], (int)[data length], SQLITE_TRANSIENT);
             break;
         }
         case SQLRatPackObjectTypeInteger:{
             NSNumber *number = (NSNumber *)value;
-            err = sqlite3_bind_int64(_stmt, (int)binding, [number longLongValue]);
+            err = sqlite3_bind_int64(self.stmt, (int)binding, [number longLongValue]);
             break;
         }
         case SQLRatPackObjectTypeFloat:{
             NSNumber *number = (NSNumber *)value;
-            err = sqlite3_bind_double(_stmt, (int)binding, [number doubleValue]);
+            err = sqlite3_bind_double(self.stmt, (int)binding, [number doubleValue]);
             break;
         }
         case SQLRatPackObjectTypeBlob:{
             NSData *data = (NSData *)value;
-            err = sqlite3_bind_blob(_stmt, (int)binding, [data bytes], (int)[data length], SQLITE_TRANSIENT);
+            err = sqlite3_bind_blob(self.stmt, (int)binding, [data bytes], (int)[data length], SQLITE_TRANSIENT);
             break;
         }
         default:
@@ -226,7 +228,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 - (BOOL)bind:(NSObject *)value toName:(NSString *)name withError:(NSError **)outError {
     const char *bindName = [name cStringUsingEncoding:NSUTF8StringEncoding];
-    int idx = sqlite3_bind_parameter_index(_stmt, bindName);
+    int idx = sqlite3_bind_parameter_index(self.stmt, bindName);
     if (idx == 0) {
         return YES;
     }
@@ -263,9 +265,9 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (BOOL)stepWithError:(NSError **)outError {
-    int err = sqlite3_step(_stmt);
-    _done = (err == SQLITE_DONE);
-    _haveRow = (err == SQLITE_ROW);
+    int err = sqlite3_step(self.stmt);
+    self.done = (err == SQLITE_DONE);
+    self.haveRow = (err == SQLITE_ROW);
     if (err < 100) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         SetError(outError, error);
@@ -276,18 +278,8 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (BOOL)haveStmt {
-    BOOL haveStmt = (_stmt != NULL);
+    BOOL haveStmt = (self.stmt != NULL);
     return haveStmt;
-}
-
-
-- (BOOL)haveRow {
-    return _haveRow;
-}
-
-
-- (BOOL)done {
-    return _done;
 }
 
 
@@ -308,20 +300,20 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (NSInteger)numberOfColumns {
-    NSInteger count = (NSInteger)sqlite3_column_count(_stmt);
+    NSInteger count = (NSInteger)sqlite3_column_count(self.stmt);
     return count;
 }
 
 
 - (NSString *)columnNameByIndex:(NSInteger)column {
-    const char *text = (const char *)sqlite3_column_name(_stmt, (int)column);
+    const char *text = (const char *)sqlite3_column_name(self.stmt, (int)column);
     NSString *str = text ? @(text) : nil;
     return str;
 }
 
 
 - (int)columnTypeByIndex:(NSInteger)column {
-    return sqlite3_column_type(_stmt, (int)column);
+    return sqlite3_column_type(self.stmt, (int)column);
 }
 
 
@@ -331,19 +323,19 @@ static inline void SetError(NSError **error, NSError *e) {
     id value;
     switch (type) {
         case SQLITE_INTEGER:
-            value = @(sqlite3_column_int64(_stmt, (int)column));
+            value = @(sqlite3_column_int64(self.stmt, (int)column));
             break;
         case SQLITE_FLOAT:
-            value = @(sqlite3_column_double(_stmt, (int)column));
+            value = @(sqlite3_column_double(self.stmt, (int)column));
             break;
         case SQLITE_BLOB:{
-            const void *blob = sqlite3_column_blob(_stmt, (int)column);
-            int bytes = sqlite3_column_bytes(_stmt, (int)column);
+            const void *blob = sqlite3_column_blob(self.stmt, (int)column);
+            int bytes = sqlite3_column_bytes(self.stmt, (int)column);
             value = [NSData dataWithBytes:blob length:bytes];
             break;
         }
         case SQLITE_TEXT:{
-            value = @((const char *)sqlite3_column_text(_stmt, (int)column));
+            value = @((const char *)sqlite3_column_text(self.stmt, (int)column));
             break;
         }
         case SQLITE_NULL:
@@ -357,7 +349,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (NSString *)columnStringByIndex:(NSInteger)column {
-    const char *text = (const char *)sqlite3_column_text(_stmt, (int)column);
+    const char *text = (const char *)sqlite3_column_text(self.stmt, (int)column);
     NSString *str = text ? @(text) : nil;
     return str;
 }
@@ -367,9 +359,9 @@ static inline void SetError(NSError **error, NSError *e) {
 - (NSInteger)columnIntegerByIndex:(NSInteger)column {
     NSInteger result;
 #if INTS_ARE_64BIT
-    result = (NSInteger)sqlite3_column_int64(_stmt, (int)column);
+    result = (NSInteger)sqlite3_column_int64(self.stmt, (int)column);
 #else
-    result = (NSInteger)sqlite3_column_int(_stmt, (int)column);
+    result = (NSInteger)sqlite3_column_int(self.stmt, (int)column);
 #endif
     return result;
 }
@@ -379,9 +371,9 @@ static inline void SetError(NSError **error, NSError *e) {
 - (NSUInteger)columnUIntegerByIndex:(NSInteger)column {
     NSUInteger result;
 #if INTS_ARE_64BIT
-    result = (NSUInteger)sqlite3_column_int64(_stmt, (int)column);
+    result = (NSUInteger)sqlite3_column_int64(self.stmt, (int)column);
 #else
-    result = (NSUInteger)sqlite3_column_int(_stmt, (int)column);
+    result = (NSUInteger)sqlite3_column_int(self.stmt, (int)column);
 #endif
     return result;
 }
@@ -389,7 +381,7 @@ static inline void SetError(NSError **error, NSError *e) {
 
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"SQLPackRatStmt:%@", _current];
+    return [NSString stringWithFormat:@"SQLPackRatStmt:%@", self.current];
 }
 
 

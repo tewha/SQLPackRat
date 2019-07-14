@@ -43,11 +43,10 @@ static NSString *FinalBlockKey = @"FinalBlock";
 @property (nonatomic, readwrite, strong) NSMutableDictionary *functions;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *attaches;
 @property (nonatomic, readwrite, weak) NSError *lastError;
+@property (nonatomic, readwrite, strong) dispatch_queue_t backgroundQueue;
 @end
 
-@implementation SQLPRDatabase {
-    dispatch_queue_t _background;
-}
+@implementation SQLPRDatabase
 
 
 static inline void SetError(NSError **error, NSError *e) {
@@ -342,8 +341,8 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
 
 - (void)runInBackground:(dispatch_block_t)background {
     @synchronized(self) {
-        if (_background == NULL) _background = dispatch_queue_create("SQLPRDatabase", 0);
-        dispatch_async(_background, ^{
+        if (self.backgroundQueue == NULL) self.backgroundQueue = dispatch_queue_create("SQLPRDatabase", 0);
+        dispatch_async(self.backgroundQueue, ^{
             background();
         });
     }

@@ -43,11 +43,9 @@
 
 - (NSUInteger)columnUIntegerByIndex:(NSInteger)column;
 
-- (BOOL)haveStmt;
-
-- (BOOL)haveRow;
-
-- (BOOL)done;
+@property (nonatomic, readonly) BOOL haveStmt;
+@property (nonatomic, readonly) BOOL haveRow;
+@property (nonatomic, readonly) BOOL done;
 
 - (NSArray *)columns;
 - (NSArray *)row;

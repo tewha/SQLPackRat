@@ -29,7 +29,8 @@ static inline void SetError(NSError **error, NSError *e) {
 }
 
 
-@implementation SQLPRTransaction
+@implementation SQLPRTransaction {
+}
 
 
 - (instancetype)initWithDatabase:(SQLPRDatabase *)database label:(NSString *)label {
@@ -49,8 +50,8 @@ static inline void SetError(NSError **error, NSError *e) {
         return nil;
     }
     NSError *e;
-    _database = database;
-    _label = label;
+    self.database = database;
+    self.label = label;
     switch (startMode) {
         case SQLPackRatTransactionStartModeAutomaticallyLater:
             if (![self beginWithError:&e]) {
@@ -87,14 +88,14 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)beginImmediateWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog(@"beginImmediate:%@", _label);
+    NSLog(@"beginImmediate:%@", self.label);
 #endif
-    if (![_database executeSQL:@"BEGIN IMMEDIATE;" bindingKeyValues:nil withError:&error]) {
+    if (![self.database executeSQL:@"BEGIN IMMEDIATE;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
         SetError(outError, error);
         return NO;
     }
-    _transaction = YES;
+    self.transaction = YES;
     self.lastError = nil;
     return YES;
 }
@@ -103,14 +104,14 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)beginWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog(@"begin:%@", _label);
+    NSLog(@"begin:%@", self.label);
 #endif
-    if (![_database executeSQL:@"BEGIN;" bindingKeyValues:nil withError:&error]) {
+    if (![self.database executeSQL:@"BEGIN;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
         SetError(outError, error);
         return NO;
     }
-    _transaction = YES;
+    self.transaction = YES;
     self.lastError = nil;
     return YES;
 }
@@ -119,14 +120,14 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)commitWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog(@"end:%@", _label);
+    NSLog(@"end:%@", self.label);
 #endif
-    if (![_database executeSQL:@"END;" bindingKeyValues:nil withError:&error]) {
+    if (![self.database executeSQL:@"END;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
         SetError(outError, error);
         return NO;
     }
-    _transaction = NO;
+    self.transaction = NO;
     self.lastError = nil;
     return YES;
 }
@@ -135,26 +136,26 @@ static inline void SetError(NSError **error, NSError *e) {
 - (BOOL)rollbackWithError:(NSError **)outError {
     NSError *error;
 #if DEBUG_TRANSACTIONS
-    NSLog(@"rollback:%@", _label);
+    NSLog(@"rollback:%@", self.label);
 #endif
-    if (![_database executeSQL:@"ROLLBACK;" bindingKeyValues:nil withError:&error]) {
+    if (![self.database executeSQL:@"ROLLBACK;" bindingKeyValues:nil withError:&error]) {
         self.lastError = error;
         SetError(outError, error);
         return NO;
     }
-    _transaction = NO;
+    self.transaction = NO;
     self.lastError = nil;
     return YES;
 }
 
 
 - (BOOL)isOpen {
-    return _transaction;
+    return self.transaction;
 }
 
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<SQLPackRatTransaction:%@>{open = %@}", _label, _transaction ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"<SQLPackRatTransaction:%@>{open = %@}", self.label, self.transaction ? @"YES" : @"NO"];
 }
 
 
