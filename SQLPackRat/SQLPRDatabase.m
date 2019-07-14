@@ -656,7 +656,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 
 - (NSArray *)recordsFromSQL:(NSString *)SQL bindingValues:(NSArray *)values withError:(NSError **)outError {
-    NSAssert(!(_refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
+    NSAssert(!(self.refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
     
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingValues:values withError:&error];
@@ -680,7 +680,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 
 - (NSArray *)recordsFromSQL:(NSString *)SQL bindingKeyValues:(NSDictionary *)keyValues withError:(NSError **)outError {
-    NSAssert(!(_refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
+    NSAssert(!(self.refuseMainThread && [NSThread isMainThread]), @"Called from main thread");
     
     NSError *error;
     SQLPRStmt *stmt = [self newStmtWithSQL:SQL bindingKeyValues:keyValues withError:&error];
@@ -917,7 +917,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 - (BOOL)wrapInTransactionContext:(NSString *)context block:(SQLPRTransactionBlock)block withError:(NSError **)outError {
     NSError *error;
     
-    SQLPRTransaction *transaction = _transactionsEnabled ? [self newTransactionWithLabel:context] : nil;
+    SQLPRTransaction *transaction = self.transactionsEnabled ? [self newTransactionWithLabel:context] : nil;
     if (transaction && ![transaction beginImmediateWithError:&error]) {
         SetError(outError, error);
         return NO;

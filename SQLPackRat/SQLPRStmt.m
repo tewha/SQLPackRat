@@ -291,7 +291,7 @@ static inline void SetError(NSError **error, NSError *e) {
             SetError(outError, error);
             return NO;
         }
-        if (_done) {
+        if (self.done) {
             return YES;
         }
     }
