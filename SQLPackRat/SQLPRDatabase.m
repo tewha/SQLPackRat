@@ -39,6 +39,10 @@ static NSString *StepBlockKey = @"StepBlock";
 static NSString *FinalBlockKey = @"FinalBlock";
 
 @interface SQLPRDatabase ()
+@property (nonatomic, readwrite, assign) sqlite3 *sqlite3;
+@end
+
+@interface SQLPRDatabase ()
 @property (nonatomic, readwrite, strong) NSString *path;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *customFunctions;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *attaches;
@@ -112,7 +116,7 @@ static inline long fromNSInteger(NSInteger i) {
 
 
 - (NSError *)errorWithSQL3ErrorCode:(NSInteger)errorCode {
-    return [[self class] errorWithCode:errorCode message:@(sqlite3_errmsg(_sqlite3))];
+    return [[self class] errorWithCode:errorCode message:@(sqlite3_errmsg(self.sqlite3))];
 }
 
 
@@ -138,15 +142,17 @@ static inline long fromNSInteger(NSInteger i) {
     self.path = path;
     const char *zPath = [path cStringUsingEncoding:NSUTF8StringEncoding];
     const char *zVFS = [VFS cStringUsingEncoding:NSUTF8StringEncoding];
-    int err = sqlite3_open_v2(zPath, &_sqlite3, flags, zVFS);
+    sqlite3 *sqlite3;
+    int err = sqlite3_open_v2(zPath, &sqlite3, flags, zVFS);
     if (err != SQLITE_OK) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
         SetError(outError, error);
-        sqlite3_close(_sqlite3);
-        _sqlite3 = NULL;
+        sqlite3_close(sqlite3);
+        self.sqlite3 = NULL;
         return NO;
     }
+    self.sqlite3 = sqlite3;
     return YES;
 }
 
@@ -158,7 +164,7 @@ static inline long fromNSInteger(NSInteger i) {
     NSString *SQL = @(zSQL);
     sqlite3_free(zSQL);
     
-    _attaches[name] = path;
+    self.attaches[name] = path;
     
     NSError *error;
     if (![self executeSQL:SQL bindingKeyValues:nil withError:&error]) {
@@ -172,9 +178,9 @@ static inline long fromNSInteger(NSInteger i) {
 
 
 - (void)close {
-    if (_sqlite3) {
-        if (sqlite3_close(_sqlite3) == SQLITE_OK) {
-            _sqlite3 = NULL;
+    if (self.sqlite3) {
+        if (sqlite3_close(self.sqlite3) == SQLITE_OK) {
+            self.sqlite3 = NULL;
         }
     }
 }
@@ -309,7 +315,7 @@ typedef BOOL (^SQLPackRatBindBlock)(SQLPRStmt *statement, NSError **outError);
             [st closeWithError:&error];
             return nil;
         }
-        changes += sqlite3_changes(_sqlite3);
+        changes += sqlite3_changes(self.sqlite3);
         
         [st closeWithError:&error];
         
@@ -534,7 +540,7 @@ static void SelectorFinalGlue(sqlite3_context *context) {
 
 - (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_customFunctions removeObjectForKey:sig];
+    [self.customFunctions removeObjectForKey:sig];
     
     NSMutableDictionary *customFunction;
     if (function || step || final) {
@@ -549,7 +555,7 @@ static void SelectorFinalGlue(sqlite3_context *context) {
         if (final) {
             customFunction[FinalSelectorKey] = [NSValue valueWithBytes:&final objCType:@encode(SEL)];
         }
-        _customFunctions[sig] = customFunction;
+        self.customFunctions[sig] = customFunction;
     }
     
     const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
@@ -557,7 +563,7 @@ static void SelectorFinalGlue(sqlite3_context *context) {
     void *xFunc = function ? SelectorFuncGlue : NULL;
     void *xStep = step ? SelectorStepGlue : NULL;
     void *xFinal = final ? SelectorFinalGlue : NULL;
-    int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
+    int err = sqlite3_create_function(self.sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
     if (err != SQLITE_OK) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
@@ -598,7 +604,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_customFunctions removeObjectForKey:sig];
+    [self.customFunctions removeObjectForKey:sig];
     
     NSMutableDictionary *customFunction;
     if (function || step || final) {
@@ -612,7 +618,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
         if (final) {
             customFunction[FinalBlockKey] = final;
         }
-        _customFunctions[sig] = customFunction;
+        self.customFunctions[sig] = customFunction;
     }
     
     const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
@@ -620,7 +626,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     void *xFunc = function ? BlockFuncGlue : NULL;
     void *xStep = step ? BlockStepGlue : NULL;
     void *xFinal = final ? BlockFinalGlue : NULL;
-    int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
+    int err = sqlite3_create_function(self.sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, pApp, xFunc, xStep, xFinal);
     if (err != SQLITE_OK) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
@@ -634,7 +640,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (BOOL)removeFunctionNamed:(NSString *)name argCount:(NSInteger)argCount withError:(NSError **)outError {
     const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
-    int err = sqlite3_create_function(_sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, NULL, NULL, NULL, NULL);
+    int err = sqlite3_create_function(self.sqlite3, nameCStr, (int)argCount, SQLITE_UTF8, NULL, NULL, NULL, NULL);
     if (err != SQLITE_OK) {
         NSError *error = [self errorWithSQL3ErrorCode:err];
         [self logError:error];
@@ -643,7 +649,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     }
     
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_customFunctions removeObjectForKey:sig];
+    [self.customFunctions removeObjectForKey:sig];
     
     return YES;
 }
@@ -898,9 +904,10 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 
 - (NSString *)description {
-    NSMutableString *str = [NSMutableString stringWithFormat:@"sqlite3 \"%@\"\n", _path];
-    for (NSString *name in _attaches) {
-        NSString *path = [_attaches objectForKey:name];
+    NSMutableString *str = [NSMutableString stringWithFormat:@"sqlite3 \"%@\"\n", self.path];
+    NSMutableDictionary *attaches = self.attaches;
+    for (NSString *name in attaches) {
+        NSString *path = [attaches objectForKey:name];
         [str appendFormat:@"ATTACH '%@' AS %@;\n", path, name];
     }
     return str;
@@ -935,7 +942,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (BOOL)backupTo:(SQLPRDatabase *)destination withError:(NSError **)error {
     sqlite3 *other = destination.sqlite3;
-    sqlite3_backup *backup = sqlite3_backup_init(other, "main", _sqlite3, "main");
+    sqlite3_backup *backup = sqlite3_backup_init(other, "main", self.sqlite3, "main");
     if (backup == NULL) {
         NSError *e = [[destination class] errorWithCode:sqlite3_errcode(other) message:@(sqlite3_errmsg(other))];
         [destination logError:e];
