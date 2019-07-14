@@ -38,7 +38,7 @@ func + <K,V>(left: Dictionary<K,V>, right: Dictionary<K,V>)
     return map
 }
 
-func Fail(_ code:Error, message:String) -> Never  {
+func Fail(_ code:Error, message:String) -> Never {
     let data = (message + "\n").data(using: String.Encoding.utf8)!
     FileHandle.standardError.write(data)
     exit(code.rawValue)
