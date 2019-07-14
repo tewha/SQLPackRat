@@ -40,7 +40,7 @@ static NSString *FinalBlockKey = @"FinalBlock";
 
 @interface SQLPRDatabase ()
 @property (nonatomic, readwrite, strong) NSString *path;
-@property (nonatomic, readwrite, strong) NSMutableDictionary *functions;
+@property (nonatomic, readwrite, strong) NSMutableDictionary *customFunctions;
 @property (nonatomic, readwrite, strong) NSMutableDictionary *attaches;
 @property (nonatomic, readwrite, weak) NSError *lastError;
 @property (nonatomic, readwrite, strong) dispatch_queue_t backgroundQueue;
@@ -72,7 +72,7 @@ static inline long fromNSInteger(NSInteger i) {
 - (instancetype)init {
     self = [super init];
     
-    _functions = [NSMutableDictionary dictionary];
+    _customFunctions = [NSMutableDictionary dictionary];
     _attaches = [NSMutableDictionary dictionary];
     _logErrors = SQLPACKRAT_LOG_ERRORS;
     _transactionsEnabled = !SQLPACKRAT_DISABLE_TRANSACTIONS;
@@ -534,26 +534,26 @@ static void SelectorFinalGlue(sqlite3_context *context) {
 
 - (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount target:(NSObject *)target func:(SEL)function step:(SEL)step final:(SEL)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_functions removeObjectForKey:sig];
+    [_customFunctions removeObjectForKey:sig];
     
-    NSMutableDictionary *functions;
+    NSMutableDictionary *customFunction;
     if (function || step || final) {
-        functions = [NSMutableDictionary dictionary];
-        functions[TargetKey] = target;
+        customFunction = [NSMutableDictionary dictionary];
+        customFunction[TargetKey] = target;
         if (function) {
-            functions[FuncSelectorKey] = [NSValue valueWithBytes:&function objCType:@encode(SEL)];
+            customFunction[FuncSelectorKey] = [NSValue valueWithBytes:&function objCType:@encode(SEL)];
         }
         if (step) {
-            functions[StepSelectorKey] = [NSValue valueWithBytes:&step objCType:@encode(SEL)];
+            customFunction[StepSelectorKey] = [NSValue valueWithBytes:&step objCType:@encode(SEL)];
         }
         if (final) {
-            functions[FinalSelectorKey] = [NSValue valueWithBytes:&final objCType:@encode(SEL)];
+            customFunction[FinalSelectorKey] = [NSValue valueWithBytes:&final objCType:@encode(SEL)];
         }
-        _functions[sig] = functions;
+        _customFunctions[sig] = customFunction;
     }
     
     const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
-    void *pApp = (__bridge void *)functions;
+    void *pApp = (__bridge void *)customFunction;
     void *xFunc = function ? SelectorFuncGlue : NULL;
     void *xStep = step ? SelectorStepGlue : NULL;
     void *xFinal = final ? SelectorFinalGlue : NULL;
@@ -598,25 +598,25 @@ static void BlockFinalGlue(sqlite3_context *context) {
 
 - (BOOL)addFunctionNamed:(NSString *)name argCount:(NSInteger)argCount  func:(SQLPRCustomFuncBlock)function step:(SQLPRCustomStepBlock)step final:(SQLPRCustomFinalBlock)final withError:(NSError **)outError {
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_functions removeObjectForKey:sig];
+    [_customFunctions removeObjectForKey:sig];
     
-    NSMutableDictionary *functions;
+    NSMutableDictionary *customFunction;
     if (function || step || final) {
-        functions = [NSMutableDictionary dictionary];
+        customFunction = [NSMutableDictionary dictionary];
         if (function) {
-            functions[FuncBlockKey] = function;
+            customFunction[FuncBlockKey] = function;
         }
         if (step) {
-            functions[StepBlockKey] = step;
+            customFunction[StepBlockKey] = step;
         }
         if (final) {
-            functions[FinalBlockKey] = final;
+            customFunction[FinalBlockKey] = final;
         }
-        _functions[sig] = functions;
+        _customFunctions[sig] = customFunction;
     }
     
     const char *nameCStr = [name cStringUsingEncoding:NSUTF8StringEncoding];
-    void *pApp = (__bridge void *)functions;
+    void *pApp = (__bridge void *)customFunction;
     void *xFunc = function ? BlockFuncGlue : NULL;
     void *xStep = step ? BlockStepGlue : NULL;
     void *xFinal = final ? BlockFinalGlue : NULL;
@@ -643,7 +643,7 @@ static void BlockFinalGlue(sqlite3_context *context) {
     }
     
     NSString *sig = [NSString stringWithFormat:@"%@-%ld", name, fromNSInteger(argCount)];
-    [_functions removeObjectForKey:sig];
+    [_customFunctions removeObjectForKey:sig];
     
     return YES;
 }
